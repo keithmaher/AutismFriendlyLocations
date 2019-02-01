@@ -1,6 +1,5 @@
 package com.keithmaher.autismfriendlylocations;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,9 +10,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class BaseActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import com.keithmaher.autismfriendlylocations.adapters.LocationListAdapter;
+import com.keithmaher.autismfriendlylocations.fragments.LocationFragment;
+import com.keithmaher.autismfriendlylocations.models.Location;
 
+import java.util.ArrayList;
+
+public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    public Bundle activityInfo; // Used for persistence (of sorts)
+    public LocationFragment locationFragment; // How we'll 'share' our List of Coffees between Activities
+    public static ArrayList<Location> locationList = new ArrayList<>();
     protected DrawerLayout drawer;
 
     @Override
@@ -36,7 +43,7 @@ public class BaseActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -73,8 +80,8 @@ public class BaseActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            Intent login = new Intent(this, TEST.class);
-            startActivity(login);
+//            Intent login = new Intent(this, AllLocations.class);
+//            startActivity(login);
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
