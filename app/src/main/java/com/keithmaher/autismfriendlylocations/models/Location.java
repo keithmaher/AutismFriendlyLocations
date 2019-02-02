@@ -6,7 +6,7 @@ import static java.util.UUID.randomUUID;
 
 public class Location {
 
-    public int locationId;
+    public String locationId;
     public String locationName;
     public double locationLong;
     public double locationLat;
@@ -18,7 +18,7 @@ public class Location {
     public Location() {
     }
 
-    public Location(int locationId, String locationName, double locationLong, double locationLat, float locationRating, String locationComments, boolean locationFavourites) {
+    public Location(String locationId, String locationName, double locationLong, double locationLat, float locationRating, String locationComments, boolean locationFavourites) {
         this.locationId = locationId;
         this.locationName = locationName;
         this.locationLong = locationLong;
@@ -28,11 +28,11 @@ public class Location {
         this.locationFavourites = locationFavourites;
     }
 
-    public int getLocationId() {
+    public String getLocationId() {
         return locationId;
     }
 
-    public void setLocationId(int locationId) {
+    public void setLocationId(String locationId) {
         this.locationId = locationId;
     }
 

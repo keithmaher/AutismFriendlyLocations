@@ -2,6 +2,7 @@ package com.keithmaher.autismfriendlylocations.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -12,16 +13,23 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.keithmaher.autismfriendlylocations.AllLocations;
 import com.keithmaher.autismfriendlylocations.BaseActivity;
+import com.keithmaher.autismfriendlylocations.SingleLocation;
+import com.keithmaher.autismfriendlylocations.adapters.LocationFilter;
 import com.keithmaher.autismfriendlylocations.adapters.LocationListAdapter;
 
 import android.app.ListFragment;
+import android.widget.Toast;
+
+import static com.keithmaher.autismfriendlylocations.BaseActivity.locationList;
 
 public class LocationFragment extends ListFragment implements View.OnClickListener, AbsListView.MultiChoiceModeListener {
 
     public BaseActivity activity;
     public static LocationListAdapter listAdapter;
     public ListView listView;
+    public LocationFilter locationFilter;
 
     public LocationFragment() {
         // Required empty public constructor
@@ -43,7 +51,8 @@ public class LocationFragment extends ListFragment implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        listAdapter = new LocationListAdapter(activity,  BaseActivity.locationList);
+        listAdapter = new LocationListAdapter(activity,  locationList);
+        locationFilter = new LocationFilter(locationList, "all", listAdapter);
         setListAdapter (listAdapter);
     }
 
@@ -56,6 +65,18 @@ public class LocationFragment extends ListFragment implements View.OnClickListen
         listView.setMultiChoiceModeListener(this);
 
         return v;
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        Bundle activityInfo = new Bundle(); // Creates a new Bundle object
+        activityInfo.putString("locationId", (String) v.getTag());
+        Intent goEdit = new Intent(getActivity(), SingleLocation.class); // Creates a new Intent
+        /* Add the bundle to the intent here */
+        goEdit.putExtras(activityInfo);
+        getActivity().startActivity(goEdit);
     }
 
     @Override

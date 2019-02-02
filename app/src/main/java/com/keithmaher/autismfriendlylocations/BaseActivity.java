@@ -1,5 +1,25 @@
 package com.keithmaher.autismfriendlylocations;
 
+import android.app.Activity;
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.support.v7.app.ActionBar;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
+import android.text.TextUtils;
+import android.view.MenuItem;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,6 +32,7 @@ import android.view.MenuItem;
 
 import com.keithmaher.autismfriendlylocations.adapters.LocationListAdapter;
 import com.keithmaher.autismfriendlylocations.fragments.LocationFragment;
+import com.keithmaher.autismfriendlylocations.fragments.SearchFragment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
 import java.util.ArrayList;
@@ -20,6 +41,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
     public Bundle activityInfo; // Used for persistence (of sorts)
     public LocationFragment locationFragment; // How we'll 'share' our List of Coffees between Activities
+    public SearchFragment searchFragment; // How we'll 'share' our List of Coffees between Activities
     public static ArrayList<Location> locationList = new ArrayList<>();
     protected DrawerLayout drawer;
 
@@ -67,7 +89,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            //startActivity(new Intent(this, Settings.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -79,22 +101,17 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-//            Intent login = new Intent(this, AllLocations.class);
-//            startActivity(login);
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_search) {
+            startActivity(new Intent(this, Search.class));
+        } else if (id == R.id.nav_add) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_login) {
 
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_logout) {
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
