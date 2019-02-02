@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-
 import com.keithmaher.autismfriendlylocations.fragments.LocationFragment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
@@ -19,9 +18,8 @@ public class AllLocations extends BaseActivity {
         drawer.addView(contentView, 0);
         setTitle("All Locations");
 
-
         //input details to list for now
-        Location a = new Location("1231", "Costa", 22.0121, 55.254, 2.12345f, "Nice place", false);
+        Location a = new Location("1231", "Costa", -7.7207914, 52.3508738, 2.12345f, "Nice place", false);
         Location b = new Location("2542", "This is a test2", 22.0121, 55.254, 2.12345f, "Nice place", false);
         Location c = new Location("1233", "This is a test", 22.0121, 55.254, 2.12345f, "Nice place", false);
         Location d = new Location("2544", "Hello", 22.0121, 55.254, 2.12345f, "Nice place", false);

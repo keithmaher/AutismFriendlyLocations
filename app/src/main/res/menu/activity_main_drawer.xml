@@ -5,9 +5,13 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/home"
+            android:title="Home Feed" />
+        <item
             android:id="@+id/nav_search"
             android:icon="@drawable/search"
-            android:title="Search" />
+            android:title="Search Locations" />
         <item
             android:id="@+id/nav_add"
             android:icon="@drawable/add"

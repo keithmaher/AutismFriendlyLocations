@@ -1,24 +1,5 @@
 package com.keithmaher.autismfriendlylocations;
 
-import android.app.Activity;
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBar;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
-import android.view.MenuItem;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -30,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.keithmaher.autismfriendlylocations.adapters.LocationListAdapter;
 import com.keithmaher.autismfriendlylocations.fragments.LocationFragment;
 import com.keithmaher.autismfriendlylocations.fragments.SearchFragment;
 import com.keithmaher.autismfriendlylocations.models.Location;
@@ -58,8 +38,9 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
 
@@ -109,6 +90,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_logout) {
 
+        }else if (id == R.id.nav_home) {
+            startActivity(new Intent(this, AllLocations.class));
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
