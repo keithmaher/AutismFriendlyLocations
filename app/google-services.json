@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "255015809179",
+    "firebase_url": "https://autismfriendlylocations.firebaseio.com",
+    "project_id": "autismfriendlylocations",
+    "storage_bucket": "autismfriendlylocations.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255015809179:android:918ec50a9e145e60",
+        "android_client_info": {
+          "package_name": "com.keithmaher.autismfriendlylocations"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "255015809179-gusj470knj4pi5gqtqchovt9nhcop74v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.keithmaher.autismfriendlylocations",
+            "certificate_hash": "97d56d6bdc2b5b44fe3f69057c79c1775ea9d85a"
+          }
+        },
+        {
+          "client_id": "255015809179-8utmanl2m9746b2rg49euj2huoa8b8sd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByRKD2FXKlC9kZ60--Y8L7_gUmzdyLeP0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "255015809179-8utmanl2m9746b2rg49euj2huoa8b8sd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

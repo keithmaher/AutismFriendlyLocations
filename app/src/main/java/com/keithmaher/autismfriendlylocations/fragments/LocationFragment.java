@@ -1,6 +1,6 @@
 package com.keithmaher.autismfriendlylocations.fragments;
 
-import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,15 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
-
-import com.keithmaher.autismfriendlylocations.AllLocations;
 import com.keithmaher.autismfriendlylocations.BaseActivity;
 import com.keithmaher.autismfriendlylocations.SingleLocation;
 import com.keithmaher.autismfriendlylocations.adapters.LocationFilter;
 import com.keithmaher.autismfriendlylocations.adapters.LocationListAdapter;
-
-import android.app.ListFragment;
-import android.widget.Toast;
 
 import static com.keithmaher.autismfriendlylocations.BaseActivity.locationList;
 
@@ -72,10 +67,13 @@ public class LocationFragment extends ListFragment implements View.OnClickListen
         super.onListItemClick(l, v, position, id);
 
         Bundle activityInfo = new Bundle(); // Creates a new Bundle object
+        Bundle moreinfo = new Bundle(); // Creates a new Bundle object
         activityInfo.putString("locationId", (String) v.getTag());
+        moreinfo.putString("test", this.getActivity().getIntent().toString());
         Intent goEdit = new Intent(getActivity(), SingleLocation.class); // Creates a new Intent
         /* Add the bundle to the intent here */
         goEdit.putExtras(activityInfo);
+        goEdit.putExtras(moreinfo);
         getActivity().startActivity(goEdit);
     }
 

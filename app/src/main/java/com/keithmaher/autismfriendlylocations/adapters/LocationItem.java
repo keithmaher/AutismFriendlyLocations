@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.keithmaher.autismfriendlylocations.R;
@@ -26,8 +25,6 @@ public class LocationItem {
 
     private void updateControls(Location location) {
         ((TextView) view.findViewById(R.id.rowLocationName)).setText(location.locationName);
-        ((TextView) view.findViewById(R.id.rowLocationAddress)).setText(location.locationComments);
-
+        ((TextView) view.findViewById(R.id.rowLocationAddress)).setText(location.locationAddress);
     }
-
 }

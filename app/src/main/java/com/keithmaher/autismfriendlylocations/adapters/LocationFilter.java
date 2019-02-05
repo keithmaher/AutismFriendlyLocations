@@ -36,14 +36,6 @@ public class LocationFilter extends Filter {
             if (filterText.equals("all")) {
                 results.values = originalLocationList;
                 results.count = originalLocationList.size();
-            } else {
-                if (filterText.equals("favourites")) {
-                    for (Location c : originalLocationList)
-                        if (c.locationFavourites)
-                            newLocation.add(c);
-                }
-                results.values = newLocation;
-                results.count = newLocation.size();
             }
         } else {
             String prefixString = prefix.toString().toLowerCase();
@@ -53,8 +45,6 @@ public class LocationFilter extends Filter {
                 locationName = c.locationName.toLowerCase();
                 if (locationName.contains(prefixString)) {
                     if (filterText.equals("all")) {
-                        newLocation.add(c);
-                    } else if (c.locationFavourites) {
                         newLocation.add(c);
                     }
                 }
@@ -78,4 +68,5 @@ public class LocationFilter extends Filter {
             adapter.locationList = originalLocationList;
         }
     }
+
 }

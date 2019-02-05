@@ -1,15 +1,17 @@
 package com.keithmaher.autismfriendlylocations;
 
 import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 
+import com.keithmaher.autismfriendlylocations.fragments.LocationFragment;
 import com.keithmaher.autismfriendlylocations.fragments.SearchFragment;
+import com.keithmaher.autismfriendlylocations.models.Location;
 
-public class Search extends BaseActivity {
+public class Add extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,11 +19,7 @@ public class Search extends BaseActivity {
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_search, null, false);
         drawer.addView(contentView, 0);
-        setTitle("Search Locations");
-
-        Button buttonManual = findViewById(R.id.buttonManual);
-        buttonManual.setVisibility(View.GONE);
-
+        setTitle("Add Locations");
     }
 
     @Override

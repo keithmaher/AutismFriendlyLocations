@@ -1,8 +1,7 @@
 package com.keithmaher.autismfriendlylocations.models;
 
+import java.util.ArrayList;
 import java.util.UUID;
-
-import static java.util.UUID.randomUUID;
 
 public class Location {
 
@@ -10,22 +9,41 @@ public class Location {
     public String locationName;
     public double locationLong;
     public double locationLat;
-    public float locationRating;
-    public String locationComments;
-    public boolean locationFavourites;
+    public String locationAddress;
+    public int locationLikes;
+    public ArrayList<Comment> locationComments;
 
 
     public Location() {
     }
 
-    public Location(String locationId, String locationName, double locationLong, double locationLat, float locationRating, String locationComments, boolean locationFavourites) {
+    public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, int locationLikes) {
         this.locationId = locationId;
         this.locationName = locationName;
         this.locationLong = locationLong;
         this.locationLat = locationLat;
-        this.locationRating = locationRating;
+        this.locationAddress = locationAddress;
+        this.locationLikes = locationLikes;
+    }
+
+    public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, int locationLikes, ArrayList<Comment> locationComments) {
+        this.locationId = locationId;
+        this.locationName = locationName;
+        this.locationLong = locationLong;
+        this.locationLat = locationLat;
+        this.locationAddress = locationAddress;
+        this.locationLikes = locationLikes;
         this.locationComments = locationComments;
-        this.locationFavourites = locationFavourites;
+    }
+
+    public Location(String locationName, double locationLong, double locationLat, String locationAddress, int locationLikes, ArrayList<Comment> locationComments) {
+        this.locationId = UUID.randomUUID().toString();
+        this.locationName = locationName;
+        this.locationLong = locationLong;
+        this.locationLat = locationLat;
+        this.locationAddress = locationAddress;
+        this.locationLikes = locationLikes;
+        this.locationComments = locationComments;
     }
 
     public String getLocationId() {
@@ -60,40 +78,27 @@ public class Location {
         this.locationLat = locationLat;
     }
 
-    public float getLocationRating() {
-        return locationRating;
+    public String getLocationAddress() {
+        return locationAddress;
     }
 
-    public void setLocationRating(float locationRating) {
-        this.locationRating = locationRating;
+    public void setLocationAddress(String locationAddress) {
+        this.locationAddress = locationAddress;
     }
 
-    public String getLocationComments() {
+    public int getLocationLikes() {
+        return locationLikes;
+    }
+
+    public void setLocationLikes(int locationLikes) {
+        this.locationLikes = locationLikes;
+    }
+
+    public ArrayList<Comment> getLocationComments() {
         return locationComments;
     }
 
-    public void setLocationComments(String locationComments) {
+    public void setLocationComments(ArrayList<Comment> locationComments) {
         this.locationComments = locationComments;
-    }
-
-    public boolean isLocationFavourites() {
-        return locationFavourites;
-    }
-
-    public void setLocationFavourites(boolean locationFavourites) {
-        this.locationFavourites = locationFavourites;
-    }
-
-    @Override
-    public String toString() {
-        return "Location{" +
-                "locationId=" + locationId +
-                ", locationName='" + locationName + '\'' +
-                ", locationLong=" + locationLong +
-                ", locationLat=" + locationLat +
-                ", locationRating=" + locationRating +
-                ", locationComments='" + locationComments + '\'' +
-                ", locationFavourites=" + locationFavourites +
-                '}';
     }
 }

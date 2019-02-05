@@ -48,7 +48,7 @@ public class SearchFragment extends LocationFragment implements AdapterView.OnIt
 
 
         searchView = activity.findViewById(R.id.searchView);
-        searchView.setQueryHint("Search Locations");
+        searchView.setQueryHint("Add Locations");
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
@@ -77,7 +77,7 @@ public class SearchFragment extends LocationFragment implements AdapterView.OnIt
     private void checkSelected(String selected)
     {
         if (selected != null) {
-            if (selected.equals("Refine Search")) {
+            if (selected.equals("Refine Add")) {
                 locationFilter.setFilter("all");
             }else if (selected.equals("All Types")){
                 locationFilter.setFilter("all");

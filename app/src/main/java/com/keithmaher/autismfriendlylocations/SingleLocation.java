@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,50 +22,61 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
 public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
 
+    FloatingActionButton addButton;
     public Context context;
     public Location aLocation;
+    public String test;
     double lon;
     double lat;
     String name;
+    String address;
     MapView mapView;
-    GoogleMap map;
 
+    FirebaseDatabase database;
+    DatabaseReference myRef;
+
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_single_location, null, false);
         drawer.addView(contentView, 0);
-
+        addButton = findViewById(R.id.addButton);
 
         context = this;
         activityInfo = getIntent().getExtras();
+        moreinfo = getIntent().getExtras();
         aLocation = getLocationObject(activityInfo.getString("locationId"));
+        test = moreinfo.getString("test");
+
+        if (test.contains("Search")) {
+            addButton.setVisibility(View.GONE);
+        }
         name = aLocation.locationName;
         lon = aLocation.locationLong;
         lat = aLocation.locationLat;
-        String rating = String.valueOf(aLocation.locationRating);
-
-        String a = String.valueOf(lon);
-        String b = String.valueOf(lat);
-
-        String c = a + "\n" + b + "\n" + a;
+        String likes = String.valueOf(aLocation.locationLikes);
+        address = aLocation.locationAddress;
 
         setTitle(name);
 
-        ((TextView) findViewById(R.id.singleNameET)).setText(aLocation.locationName);
-        ((TextView) findViewById(R.id.singleAddressET)).setText(c);
-        ((TextView) findViewById(R.id.singleRatingET)).setText(rating);
+        ((TextView) findViewById(R.id.singleNameET)).setText(name);
+        ((TextView) findViewById(R.id.singleAddressET)).setText(address);
+        ((TextView) findViewById(R.id.singleRatingET)).setText(likes);
 
         // Gets the MapView from the XML layout and creates it
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
-
-
         mapView.getMapAsync(this);
 
     }
@@ -109,5 +121,32 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    @Override
+    public void add(View v) {
+        super.add(v);
+
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference("Locations");
+        myRef.push().setValue(aLocation);
+
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+//                String value = dataSnapshot.getValue(String.class);
+//                Toast.makeText(SingleLocation.this, value, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Toast.makeText(SingleLocation.this, "Failed", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
     }
 }

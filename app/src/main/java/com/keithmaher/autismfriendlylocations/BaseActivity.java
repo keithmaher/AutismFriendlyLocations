@@ -10,20 +10,34 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.keithmaher.autismfriendlylocations.fragments.LocationFragment;
-import com.keithmaher.autismfriendlylocations.fragments.SearchFragment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    FirebaseDatabase database;
+    DatabaseReference myRef;
+
     public Bundle activityInfo; // Used for persistence (of sorts)
+    public Bundle moreinfo; // Used for persistence (of sorts)
     public LocationFragment locationFragment; // How we'll 'share' our List of Coffees between Activities
-    public SearchFragment searchFragment; // How we'll 'share' our List of Coffees between Activities
-    public static ArrayList<Location> locationList = new ArrayList<>();
+    public static List<Location> locationList = new ArrayList<>();
     protected DrawerLayout drawer;
+    public static String locationName;
+    public static String locationId;
+    public static String locationRoad;
+    public static String locationCity;
+    public static String locationState;
+    public static double locationLng;
+    public static double locationLat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +51,6 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -85,17 +98,22 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_search) {
             startActivity(new Intent(this, Search.class));
         } else if (id == R.id.nav_add) {
-
+            startActivity(new Intent(this, Add.class));
         } else if (id == R.id.nav_login) {
 
         } else if (id == R.id.nav_logout) {
 
         }else if (id == R.id.nav_home) {
-            startActivity(new Intent(this, AllLocations.class));
+            startActivity(new Intent(this, Home.class));
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public void add(View v){
+        //Toast.makeText(this, "Testing", Toast.LENGTH_SHORT).show();
+    }
+
 }

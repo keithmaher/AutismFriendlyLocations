@@ -36,4 +36,9 @@ public class LocationListAdapter extends ArrayAdapter<Location> {
     {
         return locationList.size();
     }
+
+    @Override
+    public Location getItem(int position) {
+        return locationList.get(position);
+    }
 }
