@@ -1,4 +1,4 @@
-package com.keithmaher.autismfriendlylocations;
+package com.keithmaher.autismfriendlylocations.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,11 +11,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.keithmaher.autismfriendlylocations.fragments.LocationFragment;
+import com.keithmaher.autismfriendlylocations.R;
+import com.keithmaher.autismfriendlylocations.fragments.AllLocationFragment;
+import com.keithmaher.autismfriendlylocations.fragments.AllDBLocationFragment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
 import java.util.ArrayList;
@@ -23,13 +22,12 @@ import java.util.List;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    FirebaseDatabase database;
-    DatabaseReference myRef;
-
     public Bundle activityInfo; // Used for persistence (of sorts)
     public Bundle moreinfo; // Used for persistence (of sorts)
-    public LocationFragment locationFragment; // How we'll 'share' our List of Coffees between Activities
+    public AllLocationFragment allLocationFragment;
+    public AllDBLocationFragment allDBLocationFragment;
     public static List<Location> locationList = new ArrayList<>();
+    public static List<Location> locationSearchList = new ArrayList<>();
     protected DrawerLayout drawer;
     public static String locationName;
     public static String locationId;
@@ -96,14 +94,16 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_search) {
-            startActivity(new Intent(this, Search.class));
+            startActivity(new Intent(this, SearchDBLocations.class));
         } else if (id == R.id.nav_add) {
-            startActivity(new Intent(this, Add.class));
-        } else if (id == R.id.nav_login) {
-
-        } else if (id == R.id.nav_logout) {
-
-        }else if (id == R.id.nav_home) {
+            startActivity(new Intent(this, AddLocation.class));
+        }
+//        else if (id == R.id.nav_login) {
+//
+//        } else if (id == R.id.nav_logout) {
+//
+//        }
+        else if (id == R.id.nav_home) {
             startActivity(new Intent(this, Home.class));
         }
 

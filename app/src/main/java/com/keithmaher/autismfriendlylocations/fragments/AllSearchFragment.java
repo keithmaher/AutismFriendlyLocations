@@ -4,10 +4,7 @@ package com.keithmaher.autismfriendlylocations.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView;
@@ -18,17 +15,17 @@ import com.keithmaher.autismfriendlylocations.R;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SearchFragment extends LocationFragment implements AdapterView.OnItemSelectedListener {
+public class AllSearchFragment extends AllLocationFragment implements AdapterView.OnItemSelectedListener {
 
     String selected;
     SearchView searchView;
 
-    public SearchFragment() {
+    public AllSearchFragment() {
         // Required empty public constructor
     }
 
-    public static SearchFragment newInstance() {
-        SearchFragment fragment = new SearchFragment();
+    public static AllSearchFragment newInstance() {
+        AllSearchFragment fragment = new AllSearchFragment();
         return fragment;
     }
 
@@ -36,20 +33,13 @@ public class SearchFragment extends LocationFragment implements AdapterView.OnIt
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter
-                .createFromResource(activity, R.array.locationFilter, android.R.layout.simple_spinner_item);
-
-        spinnerAdapter
-                .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(activity, R.array.locationFilter, android.R.layout.simple_spinner_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinner = activity.findViewById(R.id.searchSpinner);
         spinner.setAdapter(spinnerAdapter);
         spinner.setOnItemSelectedListener(this);
-
-
         searchView = activity.findViewById(R.id.searchView);
-        searchView.setQueryHint("Add Locations");
-
+        searchView.setQueryHint("AddLocation Locations");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -77,7 +67,7 @@ public class SearchFragment extends LocationFragment implements AdapterView.OnIt
     private void checkSelected(String selected)
     {
         if (selected != null) {
-            if (selected.equals("Refine Add")) {
+            if (selected.equals("Refine AddLocation")) {
                 locationFilter.setFilter("all");
             }else if (selected.equals("All Types")){
                 locationFilter.setFilter("all");
@@ -87,8 +77,7 @@ public class SearchFragment extends LocationFragment implements AdapterView.OnIt
                 locationFilter.setFilter("all");
             }
 
-            String filterText = ((SearchView)activity
-                    .findViewById(R.id.searchView)).getQuery().toString();
+            String filterText = ((SearchView)activity.findViewById(R.id.searchView)).getQuery().toString();
 
             if(filterText.length() > 0)
                 locationFilter.filter(filterText);

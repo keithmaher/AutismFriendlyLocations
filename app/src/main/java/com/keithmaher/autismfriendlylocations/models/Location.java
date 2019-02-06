@@ -11,10 +11,21 @@ public class Location {
     public double locationLat;
     public String locationAddress;
     public int locationLikes;
+    public String locationIcon;
     public ArrayList<Comment> locationComments;
 
 
     public Location() {
+    }
+
+    public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, int locationLikes, String locationIcon) {
+        this.locationId = locationId;
+        this.locationName = locationName;
+        this.locationLong = locationLong;
+        this.locationLat = locationLat;
+        this.locationAddress = locationAddress;
+        this.locationLikes = locationLikes;
+        this.locationIcon = locationIcon;
     }
 
     public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, int locationLikes) {
@@ -23,6 +34,7 @@ public class Location {
         this.locationLong = locationLong;
         this.locationLat = locationLat;
         this.locationAddress = locationAddress;
+        this.locationLikes = locationLikes;
         this.locationLikes = locationLikes;
     }
 

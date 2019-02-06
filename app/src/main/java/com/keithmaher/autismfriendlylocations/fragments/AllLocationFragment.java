@@ -12,26 +12,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
-import com.keithmaher.autismfriendlylocations.BaseActivity;
-import com.keithmaher.autismfriendlylocations.SingleLocation;
+import com.keithmaher.autismfriendlylocations.activities.BaseActivity;
+import com.keithmaher.autismfriendlylocations.activities.SingleLocation;
 import com.keithmaher.autismfriendlylocations.adapters.LocationFilter;
 import com.keithmaher.autismfriendlylocations.adapters.LocationListAdapter;
 
-import static com.keithmaher.autismfriendlylocations.BaseActivity.locationList;
+import static com.keithmaher.autismfriendlylocations.activities.BaseActivity.locationList;
 
-public class LocationFragment extends ListFragment implements View.OnClickListener, AbsListView.MultiChoiceModeListener {
+public class AllLocationFragment extends ListFragment implements View.OnClickListener, AbsListView.MultiChoiceModeListener {
 
     public BaseActivity activity;
     public static LocationListAdapter listAdapter;
     public ListView listView;
     public LocationFilter locationFilter;
 
-    public LocationFragment() {
+    public AllLocationFragment() {
         // Required empty public constructor
     }
 
-    public static LocationFragment newInstance() {
-        LocationFragment fragment = new LocationFragment();
+    public static AllLocationFragment newInstance() {
+        AllLocationFragment fragment = new AllLocationFragment();
         return fragment;
     }
 
@@ -71,7 +71,7 @@ public class LocationFragment extends ListFragment implements View.OnClickListen
         activityInfo.putString("locationId", (String) v.getTag());
         moreinfo.putString("test", this.getActivity().getIntent().toString());
         Intent goEdit = new Intent(getActivity(), SingleLocation.class); // Creates a new Intent
-        /* Add the bundle to the intent here */
+        /* AddLocation the bundle to the intent here */
         goEdit.putExtras(activityInfo);
         goEdit.putExtras(moreinfo);
         getActivity().startActivity(goEdit);

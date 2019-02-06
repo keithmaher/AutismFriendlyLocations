@@ -1,17 +1,15 @@
-package com.keithmaher.autismfriendlylocations;
+package com.keithmaher.autismfriendlylocations.activities;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.keithmaher.autismfriendlylocations.fragments.LocationFragment;
-import com.keithmaher.autismfriendlylocations.fragments.SearchFragment;
-import com.keithmaher.autismfriendlylocations.models.Location;
+import com.keithmaher.autismfriendlylocations.R;
+import com.keithmaher.autismfriendlylocations.fragments.AllSearchFragment;
 
-public class Add extends BaseActivity {
+public class AddLocation extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +17,7 @@ public class Add extends BaseActivity {
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_search, null, false);
         drawer.addView(contentView, 0);
-        setTitle("Add Locations");
+        setTitle("Add Location");
     }
 
     @Override
@@ -27,9 +25,9 @@ public class Add extends BaseActivity {
         super.onResume();
         Log.v("Location","Home : " + locationList);
 
-        locationFragment = SearchFragment.newInstance(); //get a new Fragment instance
+        allLocationFragment = AllSearchFragment.newInstance(); //get a new Fragment instance
         getFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, locationFragment)
+                .replace(R.id.fragment_container, allLocationFragment)
                 .commit();// add it to the current activity
     }
 }

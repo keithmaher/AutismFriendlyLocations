@@ -17,18 +17,18 @@
             android:icon="@drawable/add"
             android:title="Add Location" />
     </group>
-
-    <item android:title="User">
-        <menu>
-            <item
-                android:id="@+id/nav_login"
-                android:icon="@drawable/login"
-                android:title="Login" />
-            <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/logout"
-                android:title="Logout" />
-        </menu>
-    </item>
-
 </menu>
+
+
+<!--<item android:title="User">-->
+<!--<menu>-->
+    <!--<item-->
+        <!--android:id="@+id/nav_login"-->
+        <!--android:icon="@drawable/login"-->
+        <!--android:title="Login" />-->
+    <!--<item-->
+        <!--android:id="@+id/nav_logout"-->
+        <!--android:icon="@drawable/logout"-->
+        <!--android:title="Logout" />-->
+<!--</menu>-->
+<!--</item>-->
