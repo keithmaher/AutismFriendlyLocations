@@ -23,7 +23,7 @@ public class AddLocation extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.v("Location","Home : " + locationList);
+        Log.v("Location","Home : " + allLocationList);
 
         allLocationFragment = AllSearchFragment.newInstance(); //get a new Fragment instance
         getFragmentManager().beginTransaction()

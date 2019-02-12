@@ -16,7 +16,8 @@ import com.keithmaher.autismfriendlylocations.activities.BaseActivity;
 import com.keithmaher.autismfriendlylocations.activities.SingleLocation;
 import com.keithmaher.autismfriendlylocations.adapters.LocationFilter;
 import com.keithmaher.autismfriendlylocations.adapters.LocationListAdapter;
-import static com.keithmaher.autismfriendlylocations.activities.BaseActivity.locationSearchList;
+
+import static com.keithmaher.autismfriendlylocations.activities.BaseActivity.locationDBList;
 
 public class AllDBLocationFragment extends ListFragment implements View.OnClickListener, AbsListView.MultiChoiceModeListener {
 
@@ -45,8 +46,8 @@ public class AllDBLocationFragment extends ListFragment implements View.OnClickL
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        listAdapter = new LocationListAdapter(activity,  locationSearchList);
-        locationFilter = new LocationFilter(locationSearchList, "all", listAdapter);
+        listAdapter = new LocationListAdapter(activity,  locationDBList);
+        locationFilter = new LocationFilter(locationDBList, "all", listAdapter);
         setListAdapter (listAdapter);
     }
 

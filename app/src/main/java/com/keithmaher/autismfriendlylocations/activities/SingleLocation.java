@@ -1,7 +1,10 @@
 package com.keithmaher.autismfriendlylocations.activities;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,8 +25,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.keithmaher.autismfriendlylocations.R;
+import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+import static java.time.LocalDate.now;
 
 public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
 
@@ -34,10 +44,10 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     String address;
     MapView mapView;
     Context context;
-    Location aLocation;
     String test;
     FirebaseDatabase database;
     DatabaseReference myRef;
+    Location newLocation;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -52,17 +62,17 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
         context = this;
         activityInfo = getIntent().getExtras();
         moreinfo = getIntent().getExtras();
-        aLocation = getLocationObject(activityInfo.getString("locationId"));
+        thisLocation = getLocationObject(activityInfo.getString("locationId"));
         test = moreinfo.getString("test");
 
         if (test.contains("SearchDBLocations")) {
             addButton.setVisibility(View.GONE);
         }
-        name = aLocation.locationName;
-        lon = aLocation.locationLong;
-        lat = aLocation.locationLat;
-        String likes = String.valueOf(aLocation.locationLikes);
-        address = aLocation.locationAddress;
+        name = thisLocation.locationName;
+        lon = thisLocation.locationLong;
+        lat = thisLocation.locationLat;
+        String likes = String.valueOf(thisLocation.locationLikes);
+        address = thisLocation.locationAddress;
 
         setTitle(name);
 
@@ -77,9 +87,11 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
 
     }
 
+
+
     private Location getLocationObject(String id) {
 
-        for (Location c : locationList)
+        for (Location c : allLocationList)
             if (c.locationId.equalsIgnoreCase(id))
                 return c;
 
@@ -123,46 +135,86 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     public void add(View v) {
         super.add(v);
 
+        new AlertDialog.Builder(this)
+            .setTitle(thisLocation.locationName)
+            .setMessage("You are about to add this location"
+                    + "\n\n"
+                    + "have you been here lately, if so please leave a comment on your experience")
+            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    completeAdd();
+                    //databaseCheck();
+                }
+            })
+            .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            })
+            .show();
+
+    }
+
+    public void completeAdd(){
+        locationComments.add(new Comment("123","Keith Maher", "Testing Comments"));
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Locations");
+        final Date date = new Date();
+        final String locationId = thisLocation.locationId;
+        newLocation = new Location(thisLocation.locationId, thisLocation.locationName,
+                thisLocation.locationLong, thisLocation.locationLat,
+                thisLocation.locationAddress, 0, thisLocation.locationIcon,
+                "Keith Maher", date.toString(), locationComments);
 
-        final String locationId = aLocation.locationId;
-        myRef.child(locationId).setValue(aLocation);
+        databaseCheck();
+        myRef.child(locationId).setValue(newLocation);
+        //Toast.makeText(context, a, Toast.LENGTH_SHORT).show();
 
-        myRef.addChildEventListener(new ChildEventListener() {
+    }
+
+    public void databaseCheck(){
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            public void onDataChange(DataSnapshot snapshot) {
 
-                String test = dataSnapshot.getKey();
-                if (test.equals(locationId)){
-                    Toast.makeText(context, "Already added", Toast.LENGTH_SHORT).show();
-                }else {
-                    Toast.makeText(SingleLocation.this, "Added", Toast.LENGTH_SHORT).show();
+                if (snapshot.hasChild(thisLocation.locationId)) {
+                    new AlertDialog.Builder(SingleLocation.this)
+                            .setTitle(thisLocation.locationName)
+                            .setMessage("This Location already in our system"
+                                    + "\n\n"
+                                    + "Someone has already added this location to our system, Maybe leave a comment on your visit")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .show();
+                }else{
+                    new AlertDialog.Builder(SingleLocation.this)
+                            .setTitle(thisLocation.locationName)
+                            .setMessage("Addition Complete"
+                                    + "\n\n"
+                                    + "Thank you for your addition to our system")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    startActivity(new Intent(SingleLocation.this, SearchDBLocations.class));
+                                }
+                            })
+                            .show();
                 }
 
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(SingleLocation.this, "FAIL", Toast.LENGTH_SHORT).show();
+
             }
         });
 
     }
+
+
 }
