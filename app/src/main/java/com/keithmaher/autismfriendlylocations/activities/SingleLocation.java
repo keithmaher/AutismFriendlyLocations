@@ -11,6 +11,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +50,12 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     FirebaseDatabase database;
     DatabaseReference myRef;
     Location newLocation;
+    AlertDialog.Builder alertDialog;
+    AlertDialog dialog;
+    EditText comment;
+    EditText commentName;
+    String commentname;
+    String commentMain;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -135,15 +143,27 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     public void add(View v) {
         super.add(v);
 
-        new AlertDialog.Builder(this)
-            .setTitle(thisLocation.locationName)
+        alertDialog = new AlertDialog.Builder(this);
+            View view = getLayoutInflater().inflate(R.layout.commentbox, null);
+            alertDialog.setView(view);
+            comment = view.findViewById(R.id.editTextComment);
+            commentName = view.findViewById(R.id.editTextName);
+            alertDialog.setTitle(thisLocation.locationName)
             .setMessage("You are about to add this location"
                     + "\n\n"
-                    + "have you been here lately, if so please leave a comment on your experience")
+                    + "Please leave a comment on your experience")
             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    completeAdd();
+                    commentname = commentName.getText().toString();
+                    commentMain = comment.getText().toString();
+                    if (commentMain.isEmpty()||commentname.isEmpty()){
+                        Toast.makeText(context, "Please enter details", Toast.LENGTH_SHORT).show();
+                    }else{
+                        completeAdd();
+                    }
+
+
                     //databaseCheck();
                 }
             })
@@ -151,21 +171,22 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                 }
-            })
-            .show();
+            });
+        alertDialog.setView(view);
+        dialog = alertDialog.create();
+        dialog.show();
 
     }
 
     public void completeAdd(){
-        locationComments.add(new Comment("123","Keith Maher", "Testing Comments"));
+        Date date = new Date();
+        locationComments.add(new Comment(commentname, commentMain, date.toString()));
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Locations");
-        final Date date = new Date();
-        final String locationId = thisLocation.locationId;
+        String locationId = thisLocation.locationId;
         newLocation = new Location(thisLocation.locationId, thisLocation.locationName,
                 thisLocation.locationLong, thisLocation.locationLat,
-                thisLocation.locationAddress, 0, thisLocation.locationIcon,
-                "Keith Maher", date.toString(), locationComments);
+                thisLocation.locationAddress, 0, thisLocation.locationIcon, locationComments);
 
         databaseCheck();
         myRef.child(locationId).setValue(newLocation);
@@ -184,7 +205,7 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                             .setTitle(thisLocation.locationName)
                             .setMessage("This Location already in our system"
                                     + "\n\n"
-                                    + "Someone has already added this location to our system, Maybe leave a comment on your visit")
+                                    + "But we added your comment to " +thisLocation.locationName)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {

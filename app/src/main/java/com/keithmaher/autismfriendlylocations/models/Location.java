@@ -13,15 +13,13 @@ public class Location {
     public String locationAddress;
     public int locationLikes;
     public String locationIcon;
-    public String addedBy;
-    public String addedDate;
     public List<Comment> locationComments;
 
 
     public Location() {
     }
 
-    public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, int locationLikes, String locationIcon, String addedBy, String addedDate, List<Comment> locationComments) {
+    public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, int locationLikes, String locationIcon,  List<Comment> locationComments) {
         this.locationId = locationId;
         this.locationName = locationName;
         this.locationLong = locationLong;
@@ -29,8 +27,6 @@ public class Location {
         this.locationAddress = locationAddress;
         this.locationLikes = locationLikes;
         this.locationIcon = locationIcon;
-        this.addedBy = addedBy;
-        this.addedDate = addedDate;
         this.locationComments = locationComments;
     }
 
