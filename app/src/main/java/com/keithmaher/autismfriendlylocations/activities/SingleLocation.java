@@ -29,11 +29,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.keithmaher.autismfriendlylocations.R;
+import com.keithmaher.autismfriendlylocations.adapters.LocationListAdapter;
 import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static java.time.LocalDate.now;
 
@@ -56,6 +58,7 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     EditText commentName;
     String commentname;
     String commentMain;
+    LocationListAdapter listAdapter;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -70,11 +73,17 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
         context = this;
         activityInfo = getIntent().getExtras();
         moreinfo = getIntent().getExtras();
-        thisLocation = getLocationObject(activityInfo.getString("locationId"));
         test = moreinfo.getString("test");
 
         if (test.contains("SearchDBLocations")) {
-            addButton.setVisibility(View.GONE);
+            thisLocation = getLocationObjectDB(activityInfo.getString("locationId"));
+            addButton.setImageDrawable(getResources().getDrawable(R.drawable.star));
+            if (thisLocation.locationLikes>0) {
+                addButton.setImageDrawable(getResources().getDrawable(R.drawable.fullstar));
+                addButton.setEnabled(false);
+            }
+        }else{
+            thisLocation = getLocationObject(activityInfo.getString("locationId"));
         }
         name = thisLocation.locationName;
         lon = thisLocation.locationLong;
@@ -100,6 +109,15 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     private Location getLocationObject(String id) {
 
         for (Location c : allLocationList)
+            if (c.locationId.equalsIgnoreCase(id))
+                return c;
+
+        return null;
+    }
+
+    private Location getLocationObjectDB(String id) {
+
+        for (Location c : locationDBList)
             if (c.locationId.equalsIgnoreCase(id))
                 return c;
 
@@ -139,42 +157,54 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
         mapView.onLowMemory();
     }
 
-    @Override
+    //@Override
     public void add(View v) {
-        super.add(v);
+     //   super.add(v);
+        if (test.contains("SearchDBLocations")) {
 
-        alertDialog = new AlertDialog.Builder(this);
+            int likes = thisLocation.locationLikes+1;
+            database = FirebaseDatabase.getInstance();
+            myRef = database.getReference("Locations");
+            DatabaseReference locId = myRef.child(thisLocation.locationId);
+            DatabaseReference locLikes = locId.child("locationLikes");
+            locLikes.setValue(likes);
+            addButton.setImageDrawable(getResources().getDrawable(R.drawable.fullstar));
+
+
+        }else {
+            alertDialog = new AlertDialog.Builder(this);
             View view = getLayoutInflater().inflate(R.layout.commentbox, null);
             alertDialog.setView(view);
             comment = view.findViewById(R.id.editTextComment);
             commentName = view.findViewById(R.id.editTextName);
             alertDialog.setTitle(thisLocation.locationName)
-            .setMessage("You are about to add this location"
-                    + "\n\n"
-                    + "Please leave a comment on your experience")
-            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    commentname = commentName.getText().toString();
-                    commentMain = comment.getText().toString();
-                    if (commentMain.isEmpty()||commentname.isEmpty()){
-                        Toast.makeText(context, "Please enter details", Toast.LENGTH_SHORT).show();
-                    }else{
-                        completeAdd();
-                    }
+                    .setMessage("You are about to add this location"
+                            + "\n\n"
+                            + "Please leave a comment on your experience")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            commentname = commentName.getText().toString();
+                            commentMain = comment.getText().toString();
+                            if (commentMain.isEmpty() || commentname.isEmpty()) {
+                                Toast.makeText(context, "Please enter details", Toast.LENGTH_SHORT).show();
+                            } else {
+                                completeAdd();
+                            }
 
 
-                    //databaseCheck();
-                }
-            })
-            .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-        alertDialog.setView(view);
-        dialog = alertDialog.create();
-        dialog.show();
+                            //databaseCheck();
+                        }
+                    })
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+            alertDialog.setView(view);
+            dialog = alertDialog.create();
+            dialog.show();
+        }
 
     }
 
@@ -212,6 +242,7 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                                 }
                             })
                             .show();
+
                 }else{
                     new AlertDialog.Builder(SingleLocation.this)
                             .setTitle(thisLocation.locationName)

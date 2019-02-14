@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -66,6 +67,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
             setContentView(R.layout.activity_base);
             Toolbar toolbar = findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -141,9 +144,12 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    public void add(View v){
-        //Toast.makeText(this, "Testing", Toast.LENGTH_SHORT).show();
-    }
+//    public void add(View v){
+//        Toast.makeText(this, thisLocation.locationName, Toast.LENGTH_SHORT).show();
+//        int a = 1 ;
+//        thisLocation.setLocationLikes(a);
+//
+//    }
 
     public void apiCall() {
 
@@ -225,13 +231,24 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
                 double lat = Double.parseDouble(dataSnapshot.child("locationLat").getValue().toString());
                 String id = dataSnapshot.child("locationId").getValue().toString();
                 String icon = dataSnapshot.child("locationIcon").getValue().toString();
+                int likes = Integer.valueOf(dataSnapshot.child("locationLikes").getValue().toString());
 
-                locationDBList.add(new Location(id, name, lng, lat, address, icon));
+                locationDBList.add(new Location(id, name, lng, lat, address, icon, likes));
 
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                String name = dataSnapshot.child("locationName").getValue().toString();
+                String address = dataSnapshot.child("locationAddress").getValue().toString();
+                double lng = Double.parseDouble(dataSnapshot.child("locationLong").getValue().toString());
+                double lat = Double.parseDouble(dataSnapshot.child("locationLat").getValue().toString());
+                String id = dataSnapshot.child("locationId").getValue().toString();
+                String icon = dataSnapshot.child("locationIcon").getValue().toString();
+                int likes = Integer.valueOf(dataSnapshot.child("locationLikes").getValue().toString());
+
+                locationDBList.add(new Location(id, name, lng, lat, address, icon, likes));
 
             }
 

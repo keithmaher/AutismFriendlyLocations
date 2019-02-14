@@ -30,6 +30,16 @@ public class Location {
         this.locationComments = locationComments;
     }
 
+    public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, String locationIcon, int locationLikes) {
+        this.locationId = locationId;
+        this.locationName = locationName;
+        this.locationLong = locationLong;
+        this.locationLat = locationLat;
+        this.locationAddress = locationAddress;
+        this.locationIcon = locationIcon;
+        this.locationLikes = locationLikes;
+    }
+
     public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, String locationIcon) {
         this.locationId = locationId;
         this.locationName = locationName;
@@ -84,7 +94,7 @@ public class Location {
     }
 
     public void setLocationLikes(int locationLikes) {
-        this.locationLikes = locationLikes;
+        this.locationLikes = this.locationLikes+locationLikes;
     }
 
     public List<Comment> getLocationComments() {
