@@ -17,7 +17,7 @@ public class AddLocation extends BaseActivity {
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_search, null, false);
         drawer.addView(contentView, 0);
-        setTitle("Add Location");
+        setTitle("Add1 Location");
     }
 
     @Override
