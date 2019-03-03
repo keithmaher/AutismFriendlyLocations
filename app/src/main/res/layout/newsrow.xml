@@ -3,20 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ImageView
-        android:id="@+id/newsUserImg"
-        android:layout_width="70dp"
-        android:layout_height="50dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginStart="8dp"
-        android:contentDescription="fav"
-        android:gravity="center_vertical"
-        android:src="@drawable/user"
-        app:layout_constraintBottom_toBottomOf="@+id/newsUserDate"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/newsUserName"
@@ -31,7 +19,7 @@
         android:textColor="@color/colorPrimary"
         android:textSize="14sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/newsUserImg"
+        app:layout_constraintStart_toEndOf="@+id/newsIcon"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -40,14 +28,23 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/newsUserName"
         android:layout_alignBottom="@+id/newsUserImg"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
-        android:paddingBottom="16dp"
         android:text="Coffee Shop"
         android:textColor="@color/black"
         android:textSize="11sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/newsUserName"
-        app:layout_constraintTop_toBottomOf="@+id/newsUserName" />
+        app:layout_constraintBottom_toBottomOf="@+id/newsIcon"
+        app:layout_constraintStart_toStartOf="@+id/newsUserName" />
+
+    <ImageView
+        android:id="@+id/newsIcon"
+        android:layout_width="100dp"
+        android:layout_height="110dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
 
 </android.support.constraint.ConstraintLayout>

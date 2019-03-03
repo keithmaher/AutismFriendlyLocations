@@ -4,13 +4,10 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.models.Comment;
-import com.keithmaher.autismfriendlylocations.models.Location;
-import com.squareup.picasso.Picasso;
 
 public class CommentItem {
 
@@ -27,7 +24,7 @@ public class CommentItem {
     }
 
     private void updateControls(Comment comment) {
-        ((TextView) view.findViewById(R.id.rowCmmentName)).setText(comment.commentName);
-        ((TextView) view.findViewById(R.id.rowCommentDate)).setText(comment.commentDate);
+        ((TextView) view.findViewById(R.id.newsUserName)).setText(comment.commentName);
+        ((TextView) view.findViewById(R.id.newsUserDate)).setText(comment.commentDate);
     }
 }

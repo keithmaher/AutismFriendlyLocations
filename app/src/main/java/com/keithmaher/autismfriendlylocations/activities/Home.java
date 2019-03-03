@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.keithmaher.autismfriendlylocations.R;
+import com.keithmaher.autismfriendlylocations.fragments.NewsFragment;
 
 public class Home extends BaseActivity {
 
@@ -14,10 +15,9 @@ public class Home extends BaseActivity {
         super.onCreate(savedInstanceState);
 
             LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View contentView = inflater.inflate(R.layout.activity_alllocations, null, false);
+            View contentView = inflater.inflate(R.layout.activity_home, null, false);
             drawer.addView(contentView, 0);
             setTitle("News Feed");
-
 
     }
 
@@ -26,11 +26,10 @@ public class Home extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-//        allLocationFragment = AllLocationFragment.newInstance(); //get a new Fragment instance
-//        getFragmentManager().beginTransaction()
-//                .replace(R.id.fragment_container, allLocationFragment)
-//                .commit();// add it to the current activity
-
+        newsFragment = NewsFragment.newInstance(); //get a new Fragment instance
+        getFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, newsFragment)
+                .commit();// add it to the current activity
     }
 
 }

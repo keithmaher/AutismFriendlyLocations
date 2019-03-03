@@ -75,7 +75,6 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View contentView = inflater.inflate(R.layout.activity_single_location, null, false);
         drawer.addView(contentView, 0);
@@ -83,18 +82,10 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
         FrameLayout frame = findViewById(R.id.commentFrame);
         frame.setVisibility(View.GONE);
 
-
         context = this;
         activityInfo = getIntent().getExtras();
         moreinfo = getIntent().getExtras();
         test = moreinfo.getString("test");
-
-        if (test.contains("Search")) {
-            frame.setVisibility(View.VISIBLE);
-            thisLocation = getLocationObjectDB(activityInfo.getString("locationId"));
-            addButton.setImageDrawable(getResources().getDrawable(R.drawable.comment));
-            singleComment = thisLocation.locationComments;
-        }
 
         if (test.contains("AddLocation")) {
             thisLocation = getLocationObject(activityInfo.getString("locationId"));
@@ -105,6 +96,13 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                     singleComment = locationDBList.get(i).locationComments;
                 }
             }
+        }
+
+        if (test.contains("Search")) {
+            frame.setVisibility(View.VISIBLE);
+            thisLocation = getLocationObjectDB(activityInfo.getString("locationId"));
+            addButton.setImageDrawable(getResources().getDrawable(R.drawable.comment));
+            singleComment = thisLocation.locationComments;
         }
 
         name = thisLocation.locationName;
@@ -299,26 +297,31 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     public void completeAdd(){
         Date cDate = new Date();
         String fDate = new SimpleDateFormat("dd-MM-yyyy").format(cDate);
-//        if (test.contains("AddLocation")) {
-//            thisLocation = getLocationObject(activityInfo.getString("locationId"));
-//            String id = thisLocation.locationId;
-//            for (int i = 0; i < locationDBList.size(); i ++){
-//                if (id.equals(locationDBList.get(i).locationId)){
-//                    singleComment = locationDBList.get(i).locationComments;
-//                }else{
-//                    singleComment.clear();
-//                }
-//            }
-//        }
-        singleComment.add(new Comment(commentname, commentMain, fDate));
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("Locations");
-        String locationId = thisLocation.locationId;
-        newLocation = new Location(thisLocation.locationId, thisLocation.locationName, thisLocation.locationLong, thisLocation.locationLat, thisLocation.locationAddress, thisLocation.locationIcon, singleComment);
         if (test.contains("SearchDBLocations")) {
+            singleComment.add(new Comment(commentname, commentMain, fDate));
+            database = FirebaseDatabase.getInstance();
+            myRef = database.getReference("Locations");
+            String locationId = thisLocation.locationId;
+            newLocation = new Location(thisLocation.locationId, thisLocation.locationName, thisLocation.locationLong, thisLocation.locationLat, thisLocation.locationAddress, thisLocation.locationIcon, singleComment);
             databaseCheckDB();
-        }else {
+            myRef.child(locationId).child("locationComments").setValue(singleComment);
+        }else if (test.contains("Add")){
+            singleComment.add(new Comment(commentname, commentMain, fDate));
+            database = FirebaseDatabase.getInstance();
+            myRef = database.getReference("Locations");
+            newLocation = new Location(thisLocation.locationId, thisLocation.locationName, thisLocation.locationLong, thisLocation.locationLat, thisLocation.locationAddress, thisLocation.locationIcon, singleComment);
+            String id = thisLocation.locationId;
+            for (int i = 0; i < locationDBList.size(); i ++){
+                if (id.equals(locationDBList.get(i).locationId)){
+                    List<Comment> emptyList = new ArrayList<>();
+                    emptyList.add(new Comment(commentname, commentMain, fDate));
+                    database = FirebaseDatabase.getInstance();
+                    myRef = database.getReference("Locations");
+                    newLocation = new Location(thisLocation.locationId, thisLocation.locationName, thisLocation.locationLong, thisLocation.locationLat, thisLocation.locationAddress, thisLocation.locationIcon, emptyList);
+                }
+            }
             databaseCheck();
+            myRef.child(thisLocation.locationId).setValue(newLocation);
         }
 
     }
@@ -338,11 +341,6 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    myRef.child(thisLocation.locationId).setValue(newLocation);
-//                                    locationDBList.clear();
-//                                    singleComment.clear();
-//                                    allLocationList.clear();
-//                                    databasePull();
                                     startActivity(new Intent(SingleLocation.this, SearchDBLocations.class));
                                 }
                             })
@@ -357,11 +355,6 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    myRef.child(thisLocation.locationId).setValue(newLocation);
-//                                    locationDBList.clear();
-//                                    singleComment.clear();
-//                                    allLocationList.clear();
-//                                    databasePull();
                                     startActivity(new Intent(SingleLocation.this, SearchDBLocations.class));
                                 }
                             })
@@ -393,11 +386,6 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    myRef.child(locationId).child("locationComments").setValue(singleComment);
-//                                    locationDBList.clear();
-//                                    singleComment.clear();
-//                                    allLocationList.clear();
-//                                    databasePull();
                                 }
                             })
                             .show();
@@ -411,11 +399,7 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    myRef.child(locationId).child("locationComments").setValue(singleComment);
-//                                    locationDBList.clear();
-//                                    singleComment.clear();
-//                                    allLocationList.clear();
-//                                    databasePull();
+
                                 }
                             })
                             .show();

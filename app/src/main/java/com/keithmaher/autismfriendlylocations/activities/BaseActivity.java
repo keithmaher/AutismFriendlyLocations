@@ -1,10 +1,13 @@
 package com.keithmaher.autismfriendlylocations.activities;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -34,8 +37,10 @@ import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.fragments.AllLocationFragment;
 import com.keithmaher.autismfriendlylocations.fragments.AllDBLocationFragment;
 import com.keithmaher.autismfriendlylocations.fragments.CommentFragment;
+import com.keithmaher.autismfriendlylocations.fragments.NewsFragment;
 import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
+import com.keithmaher.autismfriendlylocations.models.News;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,17 +49,21 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Thread.*;
+
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public Bundle activityInfo; // Used for persistence (of sorts)
     public Bundle moreinfo; // Used for persistence (of sorts)
     public AllLocationFragment allLocationFragment;
     public AllDBLocationFragment allDBLocationFragment;
+    public NewsFragment newsFragment;
     public CommentFragment commentFragment;
     public static List<Location> allLocationList = new ArrayList<>();
     public static List<Location> locationDBList = new ArrayList<>();
     public static List<Comment> locationComments = new ArrayList<>();
     public static List<Comment> singleComment = new ArrayList<>();
+    public static List<News> singleNews = new ArrayList<>();
     protected DrawerLayout drawer;
     public static String locationName;
     public static String locationId;
@@ -85,19 +94,49 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         mRequestQueue = Volley.newRequestQueue(this);
-
         if (locationDBList.isEmpty()) databasePull();
         if (allLocationList.isEmpty()) apiCall();
+
+        if(mContext.toString().contains("Home") || mContext.toString().contains("Add")) {
+
+            final ProgressDialog progress = new ProgressDialog(this);
+            progress.setTitle("Collecting Data");
+            progress.setMessage("Please be patient...");
+            progress.show();
+
+            Runnable progressRunnable = new Runnable() {
+
+                @Override
+                public void run() {
+                    progress.cancel();
+                }
+            };
+
+            Handler pdCanceller = new Handler();
+            pdCanceller.postDelayed(progressRunnable, 2000);
+
+            progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    progress.dismiss();
+                }
+            });
+        }
+
     }
 
 
     @Override
     public void onBackPressed() {
+        String newContext = mContext.toString();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
+
+        if (newContext.contains("SingleLocation")) {
             super.onBackPressed();
+        } else if (!drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.openDrawer(GravityCompat.START);
+        } else if (drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
         }
     }
 
@@ -112,13 +151,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             startActivity(new Intent(this, SearchDBLocations.class));
         } else if (id == R.id.nav_add) {
             startActivity(new Intent(this, AddLocation.class));
-        }
-//        else if (id == R.id.nav_login) {
-//
-//        } else if (id == R.id.nav_logout) {
-//
-//        }
-        else if (id == R.id.nav_home) {
+        } else if (id == R.id.nav_home) {
             startActivity(new Intent(this, Home.class));
         }
 
@@ -127,14 +160,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-//    public void add(View v){
-//        Toast.makeText(this, thisLocation.locationName, Toast.LENGTH_SHORT).show();
-//        int a = 1 ;
-//        thisLocation.setLocationLikes(a);
-//
-//    }
-
-    public void apiCall() {
+    public Boolean apiCall() {
 
         String url = "https://api.foursquare.com/v2/venues/search?near=Clonmel,IE&v=28012019&limit=100&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
@@ -194,9 +220,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-
-        // Access the RequestQueue through your singleton class.
         mRequestQueue.add(jsonRequest);
+        return true;
     }
 
     public void databasePull() {
@@ -207,37 +232,25 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                 Location location = dataSnapshot.getValue(Location.class);
                 locationDBList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
-
+                singleNews.add(new News(location.locationComments.get(0).commentName, location.locationName, location.locationComments.get(0).commentDate, location.locationIcon));
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
                 Location location = dataSnapshot.getValue(Location.class);
                 locationDBList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
-
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                // A comment has changed, use the key to determine if we are displaying this
-                // comment and if so remove it.
-                String commentKey = dataSnapshot.getKey();
-                Toast.makeText(mContext, "TESTING", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Deletion Complete", Toast.LENGTH_SHORT).show();
 
-                // ...
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
 
-                // A comment has changed position, use the key to determine if we are
-                // displaying this comment and if so move it.
-                Comment movedComment = dataSnapshot.getValue(Comment.class);
-                String commentKey = dataSnapshot.getKey();
-                Toast.makeText(mContext, commentKey, Toast.LENGTH_SHORT).show();
-
-                // ...
             }
 
             @Override
@@ -247,6 +260,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         };
 
         mDatabase.addChildEventListener(childEventListener);
+
     }
 
 }

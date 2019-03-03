@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/rowCommentImg"
+        android:id="@+id/newsUserImg"
         android:layout_width="39dp"
         android:layout_height="39dp"
         android:layout_alignParentLeft="true"
@@ -14,32 +14,32 @@
         android:contentDescription="fav"
         android:gravity="center_vertical"
         android:src="@drawable/fav"
-        app:layout_constraintBottom_toBottomOf="@+id/rowCommentDate"
+        app:layout_constraintBottom_toBottomOf="@+id/newsUserDate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/rowCmmentName"
+        android:id="@+id/newsUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/rowCommentImg"
+        android:layout_alignTop="@+id/newsUserImg"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_toRightOf="@+id/rowCommentImg"
+        android:layout_toRightOf="@+id/newsUserImg"
         android:gravity="center_vertical"
         android:text="Coffee Name"
         android:textColor="@color/colorPrimary"
         android:textSize="14sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/rowCommentImg"
+        app:layout_constraintStart_toEndOf="@+id/newsUserImg"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/rowCommentDate"
+        android:id="@+id/newsUserDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/rowCmmentName"
-        android:layout_alignBottom="@+id/rowCommentImg"
+        android:layout_alignLeft="@+id/newsUserName"
+        android:layout_alignBottom="@+id/newsUserImg"
         android:layout_marginTop="8dp"
         android:gravity="center_vertical"
         android:paddingBottom="16dp"
@@ -47,8 +47,8 @@
         android:textColor="@color/black"
         android:textSize="11sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/rowCmmentName"
-        app:layout_constraintTop_toBottomOf="@+id/rowCmmentName" />
+        app:layout_constraintStart_toStartOf="@+id/newsUserName"
+        app:layout_constraintTop_toBottomOf="@+id/newsUserName" />
 
     <TextView
         android:id="@+id/rowDistance"
@@ -61,9 +61,9 @@
         android:textColor="@color/colorPrimary"
         android:textSize="14sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/rowCommentDate"
+        app:layout_constraintBottom_toBottomOf="@+id/newsUserDate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/rowCmmentName"
+        app:layout_constraintStart_toEndOf="@+id/newsUserName"
         app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>
