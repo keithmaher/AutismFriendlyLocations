@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -32,6 +33,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.fragments.AllLocationFragment;
 import com.keithmaher.autismfriendlylocations.fragments.AllDBLocationFragment;
+import com.keithmaher.autismfriendlylocations.fragments.CommentFragment;
 import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
@@ -48,9 +50,11 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     public Bundle moreinfo; // Used for persistence (of sorts)
     public AllLocationFragment allLocationFragment;
     public AllDBLocationFragment allDBLocationFragment;
+    public CommentFragment commentFragment;
     public static List<Location> allLocationList = new ArrayList<>();
     public static List<Location> locationDBList = new ArrayList<>();
     public static List<Comment> locationComments = new ArrayList<>();
+    public static List<Comment> singleComment = new ArrayList<>();
     protected DrawerLayout drawer;
     public static String locationName;
     public static String locationId;
@@ -60,30 +64,30 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     public static double locationLng;
     public static double locationLat;
     RequestQueue mRequestQueue;
-    FirebaseDatabase database;
-    DatabaseReference myRef;
-    Location thisLocation;
+    DatabaseReference mDatabase;
+    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_base);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        mContext = this;
 
-            setContentView(R.layout.activity_base);
-            Toolbar toolbar = findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
+        drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
-            drawer = findViewById(R.id.drawer_layout);
-            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-            drawer.addDrawerListener(toggle);
-            toggle.syncState();
-            NavigationView navigationView = findViewById(R.id.nav_view);
-            navigationView.setNavigationItemSelectedListener(this);
+        mRequestQueue = Volley.newRequestQueue(this);
 
-            mRequestQueue = Volley.newRequestQueue(this);
-            if (allLocationList.isEmpty()) apiCall();
-            if (locationDBList.isEmpty()) databasePull();
+        if (locationDBList.isEmpty()) databasePull();
+        if (allLocationList.isEmpty()) apiCall();
     }
 
 
@@ -97,27 +101,6 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            //startActivity(new Intent(this, Settings.class));
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -217,57 +200,53 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void databasePull() {
+        mDatabase = FirebaseDatabase.getInstance().getReference("Locations");
 
-        database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("Locations");
-
-        myRef.addChildEventListener(new ChildEventListener() {
-
+        ChildEventListener childEventListener = new ChildEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                String name = dataSnapshot.child("locationName").getValue().toString();
-                String address = dataSnapshot.child("locationAddress").getValue().toString();
-                double lng = Double.parseDouble(dataSnapshot.child("locationLong").getValue().toString());
-                double lat = Double.parseDouble(dataSnapshot.child("locationLat").getValue().toString());
-                String id = dataSnapshot.child("locationId").getValue().toString();
-                String icon = dataSnapshot.child("locationIcon").getValue().toString();
-                int likes = Integer.valueOf(dataSnapshot.child("locationLikes").getValue().toString());
-
-                locationDBList.add(new Location(id, name, lng, lat, address, icon, likes));
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                Location location = dataSnapshot.getValue(Location.class);
+                locationDBList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
 
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                String name = dataSnapshot.child("locationName").getValue().toString();
-                String address = dataSnapshot.child("locationAddress").getValue().toString();
-                double lng = Double.parseDouble(dataSnapshot.child("locationLong").getValue().toString());
-                double lat = Double.parseDouble(dataSnapshot.child("locationLat").getValue().toString());
-                String id = dataSnapshot.child("locationId").getValue().toString();
-                String icon = dataSnapshot.child("locationIcon").getValue().toString();
-                int likes = Integer.valueOf(dataSnapshot.child("locationLikes").getValue().toString());
-
-                locationDBList.add(new Location(id, name, lng, lat, address, icon, likes));
+            public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
+                Location location = dataSnapshot.getValue(Location.class);
+                locationDBList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
 
             }
 
             @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
+                // A comment has changed, use the key to determine if we are displaying this
+                // comment and if so remove it.
+                String commentKey = dataSnapshot.getKey();
+                Toast.makeText(mContext, "TESTING", Toast.LENGTH_SHORT).show();
+
+                // ...
             }
 
             @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
 
+                // A comment has changed position, use the key to determine if we are
+                // displaying this comment and if so move it.
+                Comment movedComment = dataSnapshot.getValue(Comment.class);
+                String commentKey = dataSnapshot.getKey();
+                Toast.makeText(mContext, commentKey, Toast.LENGTH_SHORT).show();
+
+                // ...
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // ...
+                Toast.makeText(mContext, "Failed to load comments.", Toast.LENGTH_SHORT).show();
             }
-        });
+        };
 
+        mDatabase.addChildEventListener(childEventListener);
     }
 
 }

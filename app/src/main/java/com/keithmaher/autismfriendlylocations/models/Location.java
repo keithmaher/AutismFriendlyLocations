@@ -11,7 +11,6 @@ public class Location {
     public double locationLong;
     public double locationLat;
     public String locationAddress;
-    public int locationLikes;
     public String locationIcon;
     public List<Comment> locationComments;
 
@@ -19,25 +18,14 @@ public class Location {
     public Location() {
     }
 
-    public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, int locationLikes, String locationIcon,  List<Comment> locationComments) {
+    public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, String locationIcon,  List<Comment> locationComments) {
         this.locationId = locationId;
         this.locationName = locationName;
         this.locationLong = locationLong;
         this.locationLat = locationLat;
         this.locationAddress = locationAddress;
-        this.locationLikes = locationLikes;
         this.locationIcon = locationIcon;
         this.locationComments = locationComments;
-    }
-
-    public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, String locationIcon, int locationLikes) {
-        this.locationId = locationId;
-        this.locationName = locationName;
-        this.locationLong = locationLong;
-        this.locationLat = locationLat;
-        this.locationAddress = locationAddress;
-        this.locationIcon = locationIcon;
-        this.locationLikes = locationLikes;
     }
 
     public Location(String locationId, String locationName, double locationLong, double locationLat, String locationAddress, String locationIcon) {
@@ -87,14 +75,6 @@ public class Location {
 
     public void setLocationAddress(String locationAddress) {
         this.locationAddress = locationAddress;
-    }
-
-    public int getLocationLikes() {
-        return locationLikes;
-    }
-
-    public void setLocationLikes(int locationLikes) {
-        this.locationLikes = this.locationLikes+locationLikes;
     }
 
     public List<Comment> getLocationComments() {

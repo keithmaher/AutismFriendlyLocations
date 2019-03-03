@@ -27,9 +27,9 @@ public class LocationItem {
     }
 
     private void updateControls(Location location) {
-        ((TextView) view.findViewById(R.id.rowLocationName)).setText(location.locationName);
-        ((TextView) view.findViewById(R.id.rowLocationAddress)).setText(location.locationAddress);
-        image = view.findViewById(R.id.rowLocationImg);
+        ((TextView) view.findViewById(R.id.rowCmmentName)).setText(location.locationName);
+        ((TextView) view.findViewById(R.id.rowCommentDate)).setText(location.locationAddress);
+        image = view.findViewById(R.id.rowCommentImg);
         Picasso.get().load(location.locationIcon).into(image);
     }
 }

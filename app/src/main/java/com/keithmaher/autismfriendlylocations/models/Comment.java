@@ -2,7 +2,7 @@ package com.keithmaher.autismfriendlylocations.models;
 
 import java.util.UUID;
 
-public class Comment {
+public class Comment extends Location {
 
     public String commentId;
     public String commentName;

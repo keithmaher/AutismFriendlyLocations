@@ -35,9 +35,6 @@ public class AllSearchFragment extends AllLocationFragment implements AdapterVie
 
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(activity, R.array.locationFilter, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner spinner = activity.findViewById(R.id.searchSpinner);
-        spinner.setAdapter(spinnerAdapter);
-        spinner.setOnItemSelectedListener(this);
         searchView = activity.findViewById(R.id.searchView);
         searchView.setQueryHint("AddLocation Locations");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

@@ -10,9 +10,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,13 +33,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.adapters.LocationListAdapter;
+import com.keithmaher.autismfriendlylocations.fragments.AllDBSearchFragment;
+import com.keithmaher.autismfriendlylocations.fragments.CommentFragment;
 import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import static com.keithmaher.autismfriendlylocations.fragments.AllDBLocationFragment.listAdapter;
 import static java.time.LocalDate.now;
 
 public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
@@ -58,7 +69,7 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     EditText commentName;
     String commentname;
     String commentMain;
-    LocationListAdapter listAdapter;
+    Location thisLocation;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -69,39 +80,94 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
         View contentView = inflater.inflate(R.layout.activity_single_location, null, false);
         drawer.addView(contentView, 0);
         addButton = findViewById(R.id.addButton);
+        FrameLayout frame = findViewById(R.id.commentFrame);
+        frame.setVisibility(View.GONE);
+
 
         context = this;
         activityInfo = getIntent().getExtras();
         moreinfo = getIntent().getExtras();
         test = moreinfo.getString("test");
 
-        if (test.contains("SearchDBLocations")) {
+        if (test.contains("Search")) {
+            frame.setVisibility(View.VISIBLE);
             thisLocation = getLocationObjectDB(activityInfo.getString("locationId"));
-            addButton.setImageDrawable(getResources().getDrawable(R.drawable.star));
-            if (thisLocation.locationLikes>0) {
-                addButton.setImageDrawable(getResources().getDrawable(R.drawable.fullstar));
-                addButton.setEnabled(false);
-            }
-        }else{
-            thisLocation = getLocationObject(activityInfo.getString("locationId"));
+            addButton.setImageDrawable(getResources().getDrawable(R.drawable.comment));
+            singleComment = thisLocation.locationComments;
         }
+
+        if (test.contains("AddLocation")) {
+            thisLocation = getLocationObject(activityInfo.getString("locationId"));
+            String id = thisLocation.locationId;
+            for (int i = 0; i < locationDBList.size(); i ++){
+                if (id.equals(locationDBList.get(i).locationId)){
+                    frame.setVisibility(View.VISIBLE);
+                    singleComment = locationDBList.get(i).locationComments;
+                }
+            }
+        }
+
         name = thisLocation.locationName;
         lon = thisLocation.locationLong;
         lat = thisLocation.locationLat;
-        String likes = String.valueOf(thisLocation.locationLikes);
         address = thisLocation.locationAddress;
+
 
         setTitle(name);
 
         ((TextView) findViewById(R.id.singleNameET)).setText(name);
         ((TextView) findViewById(R.id.singleAddressET)).setText(address);
-        ((TextView) findViewById(R.id.singleRatingET)).setText(likes);
 
         // Gets the MapView from the XML layout and creates it
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        if (test.contains("Search")) {
+            getMenuInflater().inflate(R.menu.main, menu);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+
+            new AlertDialog.Builder(mContext)
+                    .setTitle(thisLocation.locationName)
+                    .setMessage("Are you sure you want to delete"
+                            + "\n\n"
+                            + "This can not be undone!")
+                    .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            locationDBList.remove(thisLocation);
+                            mDatabase = FirebaseDatabase.getInstance().getReference("Locations");
+                            mDatabase.child(thisLocation.locationId).removeValue();
+                            singleComment.clear();
+                            startActivity(new Intent(mContext, SearchDBLocations.class));
+                        }
+                    })
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .show();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -128,14 +194,19 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
 
         LatLng location = new LatLng(lat, lon);
-        googleMap.addMarker(new MarkerOptions().position(location).title(name)).showInfoWindow();
+        googleMap.addMarker(new MarkerOptions().position(location)).showInfoWindow();
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
     }
 
     @Override
     public void onResume() {
         mapView.onResume();
+
         super.onResume();
+        commentFragment = CommentFragment.newInstance(); //get a new Fragment instance
+        getFragmentManager().beginTransaction()
+                .replace(R.id.commentFrame, commentFragment)
+                .commit();// add it to the current activity
     }
 
 
@@ -161,16 +232,35 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
     public void add(View v) {
      //   super.add(v);
         if (test.contains("SearchDBLocations")) {
-
-            int likes = thisLocation.locationLikes+1;
-            database = FirebaseDatabase.getInstance();
-            myRef = database.getReference("Locations");
-            DatabaseReference locId = myRef.child(thisLocation.locationId);
-            DatabaseReference locLikes = locId.child("locationLikes");
-            locLikes.setValue(likes);
-            addButton.setImageDrawable(getResources().getDrawable(R.drawable.fullstar));
-
-
+            alertDialog = new AlertDialog.Builder(this);
+            View view = getLayoutInflater().inflate(R.layout.commentbox, null);
+            alertDialog.setView(view);
+            comment = view.findViewById(R.id.editTextComment);
+            commentName = view.findViewById(R.id.editTextName);
+            alertDialog.setTitle(thisLocation.locationName)
+                    .setMessage("Adding a comment"
+                            + "\n\n"
+                            + "Please let us know how you got on")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            commentname = commentName.getText().toString();
+                            commentMain = comment.getText().toString();
+                            if (commentMain.isEmpty() || commentname.isEmpty()) {
+                                Toast.makeText(context, "Please enter details", Toast.LENGTH_SHORT).show();
+                            } else {
+                                completeAdd();
+                            }
+                        }
+                    })
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+            alertDialog.setView(view);
+            dialog = alertDialog.create();
+            dialog.show();
         }else {
             alertDialog = new AlertDialog.Builder(this);
             View view = getLayoutInflater().inflate(R.layout.commentbox, null);
@@ -191,9 +281,6 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                             } else {
                                 completeAdd();
                             }
-
-
-                            //databaseCheck();
                         }
                     })
                     .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -208,19 +295,31 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
 
     }
 
+    @SuppressLint("SimpleDateFormat")
     public void completeAdd(){
-        Date date = new Date();
-        locationComments.add(new Comment(commentname, commentMain, date.toString()));
+        Date cDate = new Date();
+        String fDate = new SimpleDateFormat("dd-MM-yyyy").format(cDate);
+//        if (test.contains("AddLocation")) {
+//            thisLocation = getLocationObject(activityInfo.getString("locationId"));
+//            String id = thisLocation.locationId;
+//            for (int i = 0; i < locationDBList.size(); i ++){
+//                if (id.equals(locationDBList.get(i).locationId)){
+//                    singleComment = locationDBList.get(i).locationComments;
+//                }else{
+//                    singleComment.clear();
+//                }
+//            }
+//        }
+        singleComment.add(new Comment(commentname, commentMain, fDate));
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference("Locations");
         String locationId = thisLocation.locationId;
-        newLocation = new Location(thisLocation.locationId, thisLocation.locationName,
-                thisLocation.locationLong, thisLocation.locationLat,
-                thisLocation.locationAddress, 0, thisLocation.locationIcon, locationComments);
-
-        databaseCheck();
-        myRef.child(locationId).setValue(newLocation);
-        //Toast.makeText(context, a, Toast.LENGTH_SHORT).show();
+        newLocation = new Location(thisLocation.locationId, thisLocation.locationName, thisLocation.locationLong, thisLocation.locationLat, thisLocation.locationAddress, thisLocation.locationIcon, singleComment);
+        if (test.contains("SearchDBLocations")) {
+            databaseCheckDB();
+        }else {
+            databaseCheck();
+        }
 
     }
 
@@ -239,6 +338,12 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    myRef.child(thisLocation.locationId).setValue(newLocation);
+//                                    locationDBList.clear();
+//                                    singleComment.clear();
+//                                    allLocationList.clear();
+//                                    databasePull();
+                                    startActivity(new Intent(SingleLocation.this, SearchDBLocations.class));
                                 }
                             })
                             .show();
@@ -252,7 +357,65 @@ public class SingleLocation extends BaseActivity implements OnMapReadyCallback {
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
+                                    myRef.child(thisLocation.locationId).setValue(newLocation);
+//                                    locationDBList.clear();
+//                                    singleComment.clear();
+//                                    allLocationList.clear();
+//                                    databasePull();
                                     startActivity(new Intent(SingleLocation.this, SearchDBLocations.class));
+                                }
+                            })
+                            .show();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void databaseCheckDB(){
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+
+                if (snapshot.hasChild(thisLocation.locationId)) {
+                    new AlertDialog.Builder(SingleLocation.this)
+                            .setTitle(thisLocation.locationName)
+                            .setMessage("Comment added successfully"
+                                    + "\n\n"
+                                    + "Thank you")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    myRef.child(locationId).child("locationComments").setValue(singleComment);
+//                                    locationDBList.clear();
+//                                    singleComment.clear();
+//                                    allLocationList.clear();
+//                                    databasePull();
+                                }
+                            })
+                            .show();
+
+                }else{
+                    new AlertDialog.Builder(SingleLocation.this)
+                            .setTitle(thisLocation.locationName)
+                            .setMessage("Addition Complete"
+                                    + "\n\n"
+                                    + "Thank you")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    myRef.child(locationId).child("locationComments").setValue(singleComment);
+//                                    locationDBList.clear();
+//                                    singleComment.clear();
+//                                    allLocationList.clear();
+//                                    databasePull();
                                 }
                             })
                             .show();
