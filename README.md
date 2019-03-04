@@ -26,4 +26,4 @@ Android Development Version 1
 * The API call is to foursquare and the information got back is stored in a list.
 
 # Video Demo
-
+https://www.youtube.com/watch?v=PxSZ_L5MpkU
