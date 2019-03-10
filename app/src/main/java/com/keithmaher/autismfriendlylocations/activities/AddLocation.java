@@ -21,6 +21,7 @@ public class AddLocation extends BaseActivity {
         drawer.addView(contentView, 0);
         setTitle("Search All Locations");
 
+
     }
 
     @Override
