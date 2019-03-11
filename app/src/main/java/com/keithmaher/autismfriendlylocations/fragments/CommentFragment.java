@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -14,19 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.keithmaher.autismfriendlylocations.activities.BaseActivity;
-import com.keithmaher.autismfriendlylocations.activities.SearchDBLocations;
-import com.keithmaher.autismfriendlylocations.activities.SingleLocation;
 import com.keithmaher.autismfriendlylocations.adapters.CommentListAdapter;
-import com.keithmaher.autismfriendlylocations.models.Comment;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static com.keithmaher.autismfriendlylocations.activities.BaseActivity.locationComments;
 import static com.keithmaher.autismfriendlylocations.activities.BaseActivity.singleComment;
 
 public class CommentFragment extends ListFragment implements View.OnClickListener, AbsListView.MultiChoiceModeListener {

@@ -61,7 +61,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     public CommentFragment commentFragment;
     public static List<Location> allLocationList = new ArrayList<>();
     public static List<Location> locationDBList = new ArrayList<>();
-    public static List<Comment> locationComments = new ArrayList<>();
+//    public static List<Comment> locationComments = new ArrayList<>();
     public static List<Comment> singleComment = new ArrayList<>();
     public static List<News> singleNews = new ArrayList<>();
     protected DrawerLayout drawer;
@@ -74,6 +74,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     public static double locationLat;
     RequestQueue mRequestQueue;
     DatabaseReference mDatabase;
+    FirebaseDatabase database;
+    DatabaseReference locations;
     Context mContext;
 
     @Override
@@ -94,34 +96,32 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         mRequestQueue = Volley.newRequestQueue(this);
-        if (locationDBList.isEmpty()) databasePull();
-        if (allLocationList.isEmpty()) apiCall();
 
-        if(mContext.toString().contains("Home") || mContext.toString().contains("Add")) {
-
-            final ProgressDialog progress = new ProgressDialog(this);
-            progress.setTitle("Collecting Data");
-            progress.setMessage("Please be patient...");
-            progress.show();
-
-            Runnable progressRunnable = new Runnable() {
-
-                @Override
-                public void run() {
-                    progress.cancel();
-                }
-            };
-
-            Handler pdCanceller = new Handler();
-            pdCanceller.postDelayed(progressRunnable, 2000);
-
-            progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    progress.dismiss();
-                }
-            });
-        }
+//        if(mContext.toString().contains("Home") || mContext.toString().contains("Add")) {
+//
+//            final ProgressDialog progress = new ProgressDialog(this);
+//            progress.setTitle("Collecting Data");
+//            progress.setMessage("Please be patient...");
+//            progress.show();
+//
+//            Runnable progressRunnable = new Runnable() {
+//
+//                @Override
+//                public void run() {
+//                    progress.cancel();
+//                }
+//            };
+//
+//            Handler pdCanceller = new Handler();
+//            pdCanceller.postDelayed(progressRunnable, 2000);
+//
+//            progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//                @Override
+//                public void onCancel(DialogInterface dialog) {
+//                    progress.dismiss();
+//                }
+//            });
+//        }
 
     }
 
@@ -160,9 +160,9 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    public Boolean apiCall() {
+    public void apiCall() {
 
-        String url = "https://api.foursquare.com/v2/venues/search?near=Clonmel,IE&v=28012019&limit=100&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
+        String url = "https://api.foursquare.com/v2/venues/search?near=Dublin,IE&v=28012019&limit=1000&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
 
             @Override
@@ -202,7 +202,9 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
                         if (locationName.isEmpty()||locationLat==0||locationLng==0||mainAddress.length()<3||locationId.isEmpty()){
 
                         }else{
-                            allLocationList.add(new Location(locationId, locationName, locationLng, locationLat, mainAddress, iconUrl));
+                            locations = database.getReference("APILocations");
+//                            allLocationList.add(new Location(locationId, locationName, locationLng, locationLat, mainAddress, iconUrl));
+                            locations.child(locationId).setValue(new Location(locationId, locationName, locationLng, locationLat, mainAddress, iconUrl));
                         }
                     }
 
@@ -219,48 +221,48 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
             }
         });
-
         mRequestQueue.add(jsonRequest);
-        return true;
     }
 
-    public void databasePull() {
-        mDatabase = FirebaseDatabase.getInstance().getReference("Locations");
 
-        ChildEventListener childEventListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                Location location = dataSnapshot.getValue(Location.class);
-                locationDBList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
-                singleNews.add(new News(location.locationComments.get(0).commentName, location.locationName, location.locationComments.get(0).commentDate, location.locationIcon));
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
-                Location location = dataSnapshot.getValue(Location.class);
-                locationDBList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                Toast.makeText(mContext, "Deletion Complete", Toast.LENGTH_SHORT).show();
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(mContext, "Failed to load comments.", Toast.LENGTH_SHORT).show();
-            }
-        };
-
-        mDatabase.addChildEventListener(childEventListener);
-
-    }
+//    public void databasePull() {
+//        mDatabase = FirebaseDatabase.getInstance().getReference("Locations");
+//
+//        ChildEventListener childEventListener = new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+//                Location location = dataSnapshot.getValue(Location.class);
+//                locationDBList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
+//                singleNews.add(new News(location.locationComments.get(0).commentName, location.locationName, location.locationComments.get(0).commentDate, location.locationIcon));
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
+//                Location location = dataSnapshot.getValue(Location.class);
+//                locationDBList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//                Toast.makeText(mContext, "Deletion Complete", Toast.LENGTH_SHORT).show();
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Toast.makeText(mContext, "Failed to load comments.", Toast.LENGTH_SHORT).show();
+//            }
+//        };
+//
+//        mDatabase.addChildEventListener(childEventListener);
+//
+//    }
 
 }

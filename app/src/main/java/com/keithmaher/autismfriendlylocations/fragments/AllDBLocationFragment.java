@@ -46,36 +46,36 @@ public class AllDBLocationFragment extends ListFragment implements View.OnClickL
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        listAdapter = new LocationListAdapter(activity,  locationDBList);
-        locationFilter = new LocationFilter(locationDBList, "all", listAdapter);
-        setListAdapter (listAdapter);
+//        listAdapter = new LocationListAdapter(activity,  locationDBList);
+//        locationFilter = new LocationFilter(locationDBList, "all", listAdapter);
+//        setListAdapter (listAdapter);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, parent, savedInstanceState);
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+//        View v = super.onCreateView(inflater, parent, savedInstanceState);
+//
+////        listView = v.findViewById(android.R.id.list);
+////        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+////        listView.setMultiChoiceModeListener(this);
+//
+//        return v;
+//    }
 
-        listView = v.findViewById(android.R.id.list);
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        listView.setMultiChoiceModeListener(this);
-
-        return v;
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        Bundle activityInfo = new Bundle(); // Creates a new Bundle object
-        Bundle moreinfo = new Bundle(); // Creates a new Bundle object
-        activityInfo.putString("locationId", (String) v.getTag());
-        moreinfo.putString("test", this.getActivity().getIntent().toString());
-        Intent goEdit = new Intent(getActivity(), SingleLocation.class); // Creates a new Intent
-
-        goEdit.putExtras(activityInfo);
-        goEdit.putExtras(moreinfo);
-        getActivity().startActivity(goEdit);
-    }
+//    @Override
+//    public void onListItemClick(ListView l, View v, int position, long id) {
+//        super.onListItemClick(l, v, position, id);
+//
+//        Bundle activityInfo = new Bundle(); // Creates a new Bundle object
+//        Bundle moreinfo = new Bundle(); // Creates a new Bundle object
+//        activityInfo.putString("locationId", (String) v.getTag());
+//        moreinfo.putString("test", this.getActivity().getIntent().toString());
+//        Intent goEdit = new Intent(getActivity(), SingleLocation.class); // Creates a new Intent
+//
+//        goEdit.putExtras(activityInfo);
+//        goEdit.putExtras(moreinfo);
+//        getActivity().startActivity(goEdit);
+//    }
 
     @Override
     public void onStart()
