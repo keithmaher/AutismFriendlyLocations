@@ -7,38 +7,40 @@
     android:layout_marginLeft="8dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="8dp"
-    android:layout_marginRight="8dp">
+    android:layout_marginRight="8dp"
+    android:id="@+id/cardId">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/newsUserImg"
-            android:layout_width="39dp"
-            android:layout_height="39dp"
-            android:layout_alignParentLeft="true"
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/commentProfileImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginStart="16dp"
-            android:contentDescription="fav"
-            android:gravity="center_vertical"
-            android:src="@drawable/fav"
+            android:src="@drawable/userfull"
+            app:civ_border_color="#FFFFFF"
+            app:civ_border_width="1dp"
             app:layout_constraintBottom_toBottomOf="@+id/newsUserDate"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/newsUserName" />
 
         <TextView
             android:id="@+id/newsUserDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/newsUserName"
-            android:layout_alignBottom="@+id/newsUserImg"
+            android:layout_alignBottom="@+id/commentProfileImage"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
             android:gravity="center_vertical"
-            android:paddingBottom="16dp"
+            android:paddingBottom="0dp"
             android:text="Coffee Shop"
             android:textColor="@color/black"
             android:textSize="11sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/newsUserName"
             app:layout_constraintTop_toBottomOf="@+id/newsUserName" />
 
@@ -46,16 +48,16 @@
             android:id="@+id/newsUserName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/newsUserImg"
+            android:layout_alignTop="@+id/commentProfileImage"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:layout_toRightOf="@+id/newsUserImg"
+            android:layout_toRightOf="@+id/commentProfileImage"
             android:gravity="center_vertical"
             android:text="Coffee Name"
             android:textColor="@color/colorPrimary"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@+id/newsUserImg"
+            app:layout_constraintStart_toEndOf="@+id/commentProfileImage"
             app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
 
