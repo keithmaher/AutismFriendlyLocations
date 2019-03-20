@@ -49,7 +49,7 @@ public class UserCommentsFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.recyclelistfragment, container, false);
         loading = view.findViewById(R.id.loadingGif2);
 
-        adapter = new UserCommentAdapterView(userCommentList, getActivity());
+        adapter = new UserCommentAdapterView(userCommentList, getActivity(), location);
 
 
         RecyclerView mRecycler = view.findViewById(R.id.recycler);

@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,23 +19,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.adapters.LocationAdapterView;
-import com.keithmaher.autismfriendlylocations.adapters.UserLocationAdapterView;
-import com.keithmaher.autismfriendlylocations.models.Comment;
+import com.keithmaher.autismfriendlylocations.adapters.NewsAdapterView;
 import com.keithmaher.autismfriendlylocations.models.Location;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import com.keithmaher.autismfriendlylocations.models.News;
 
 import pl.droidsonroids.gif.GifImageView;
 
-public class LocationUserFragment extends BaseFragment{
+public class MainNewsFragment extends BaseFragment{
 
-    UserLocationAdapterView adapter;
+    NewsAdapterView adapter;
     GifImageView loading;
+
     int position;
 
     DatabaseReference mDatabase;
@@ -44,40 +37,24 @@ public class LocationUserFragment extends BaseFragment{
     RequestQueue mRequestQueue;
 
 
-    public LocationUserFragment() {
+    public MainNewsFragment() {
     }
 
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
+        newsList.clear();
 
-        databaseLocationList.clear();
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
-        mRequestQueue = Volley.newRequestQueue(getContext());
-
-        getActivity().setTitle("My List");
-
-        final Bundle bundle = this.getArguments();
-        position = bundle.getInt("position");
-
-        final Bundle newBundle = new Bundle();
-        newBundle.putInt("position", position);
+        getActivity().setTitle("News Feed");
 
         View view = inflater.inflate(R.layout.recyclelistfragment, container, false);
         loading = view.findViewById(R.id.loadingGif2);
 
-        locationDatabase(loading);
-
-//        for(int a = 0; a < databaseLocationList.size(); a++){
-//            Toast.makeText(getContext(), databaseLocationList.get(a).locationName+" "+a, Toast.LENGTH_SHORT).show();
-//        }
-
-        adapter = new UserLocationAdapterView(databaseLocationList, getActivity());
+        adapter = new NewsAdapterView(newsList, getActivity());
 
 
         RecyclerView mRecycler = view.findViewById(R.id.recycler);
         mRecycler.setAdapter(adapter);
 
-
+        locationDatabase(loading);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecycler.setLayoutManager(mLayoutManager);
@@ -87,7 +64,7 @@ public class LocationUserFragment extends BaseFragment{
 
 
     public void locationDatabase(final GifImageView loading) {
-        databaseLocationList.clear();
+        newsList.clear();
         mDatabase = FirebaseDatabase.getInstance().getReference("Locations");
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
@@ -97,12 +74,13 @@ public class LocationUserFragment extends BaseFragment{
                     for (int i = 0; i < location.getLocationComments().size(); i++) {
                         if(location.getLocationComments().get(i) == null){
                             continue;
-                        }else if(location.getLocationComments().get(i).getCommentName().equals(firebaseUser.getEmail())) {
-                            databaseLocationList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
-                            adapter.notifyDataSetChanged();
+                        }else {
+                            newsList.add(new News(location.locationComments.get(i).getCommentName(), location.getLocationComments().get(i).getCommentDate(), location.getLocationComments().get(i).commentUserImageURL));
+
                             loading.setVisibility(View.GONE);
                         }
                     }
+                    adapter.notifyDataSetChanged();
                 }
             }
 

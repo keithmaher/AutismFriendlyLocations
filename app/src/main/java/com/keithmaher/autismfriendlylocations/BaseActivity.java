@@ -1,5 +1,7 @@
 package com.keithmaher.autismfriendlylocations;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -39,6 +41,8 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.keithmaher.autismfriendlylocations.fragments.BaseFragment;
+import com.keithmaher.autismfriendlylocations.fragments.CommentFragment;
+import com.keithmaher.autismfriendlylocations.fragments.NewsMainFragment;
 
 import java.util.UUID;
 
@@ -59,15 +63,10 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     public static Bitmap googlePhoto1;
     static FirebaseAuth firebaseAuth;
     static FirebaseUser firebaseUser;
-    public static FirebaseStorage storage;
-    public static StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference("userImages");
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -75,7 +74,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         mRequestQueue = Volley.newRequestQueue(this);
 
         setContentView(R.layout.activitymenu);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar1);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -105,14 +104,9 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             googleMail.setText(firebaseUser.getEmail());
         }
 
-
-        setTheTitle("News Feed");
-
+        BaseFragment.newsFragment(this);
     }
 
-    public void setTheTitle(String titleInput) {
-        setTitle(titleInput);
-    }
 
     @Override
     public void onBackPressed() {
@@ -132,12 +126,10 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
 
-//        String singleLocation = getSupportFragmentManager().getFragments().toString();
-//        if(singleLocation.contains("Single"))
-//        getMenuInflater().inflate(R.menu.top_menu, menu);
-        return true;
+            getMenuInflater().inflate(R.menu.top_menu, menu);
+            return true;
+
     }
 
     @Override
@@ -145,8 +137,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.menuAdd) {
+        if (id == R.id.searchSettings) {
+
             return true;
         }
 
@@ -164,9 +156,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_add) {
             BaseFragment.apiLocationFragment(this);
         } else if (id == R.id.nav_home) {
-            Intent intent = new Intent(BaseActivity.this, BaseActivity.class);
-            startActivity(intent);
-            finish();
+            BaseFragment.newsFragment(this);
         }else if (id == R.id.menu_signout){
             menuSignOut();
         }else if (id == R.id.nav_my_search){
@@ -182,6 +172,26 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 //     [START signOut]
     public void menuSignOut() {
 
+        new AlertDialog.Builder(this)
+                .setTitle("Don't Go")
+                .setMessage("We are sorry to see you leave\nCome back soon")
+                .setPositiveButton("Logout", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        logout();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+
+    }
+
+    private void logout() {
         mGoogleSignInOptions = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -220,7 +230,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
-    // [END signOut]
+
 
     public static void getGooglePhoto(final String url, final CircleImageView googlePhoto) {
         ImageRequest imgRequest = new ImageRequest(url,

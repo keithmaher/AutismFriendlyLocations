@@ -84,4 +84,12 @@ public class Location {
     public void setLocationComments(List<Comment> locationComments) {
         this.locationComments = locationComments;
     }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "locationId='" + locationId + '\'' +
+                ", locationName='" + locationName + '\'' +
+                '}';
+    }
 }

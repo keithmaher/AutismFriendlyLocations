@@ -18,8 +18,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.models.Comment;
+import com.keithmaher.autismfriendlylocations.models.Location;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -32,12 +35,14 @@ public class UserCommentAdapterView extends RecyclerView.Adapter<UserCommentAdap
 
     public List<Comment> commentList;
     FragmentActivity activity;
+    DatabaseReference mDatabase;
+    Location location;
 
 
-    public UserCommentAdapterView(ArrayList<Comment> commentList, FragmentActivity activity) {
+    public UserCommentAdapterView(ArrayList<Comment> commentList, FragmentActivity activity, Location location) {
         this.commentList = commentList;
         this.activity = activity;
-
+        this.location = location;
 
     }
 
@@ -51,7 +56,7 @@ public class UserCommentAdapterView extends RecyclerView.Adapter<UserCommentAdap
 
     @SuppressLint("RestrictedApi")
     @Override
-    public void onBindViewHolder(@NonNull final myViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull final myViewHolder viewHolder, final int i) {
 
         final Comment comment = commentList.get(i);
         viewHolder.name.setText(comment.getCommentName());
@@ -60,7 +65,7 @@ public class UserCommentAdapterView extends RecyclerView.Adapter<UserCommentAdap
         viewHolder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
                 v = activity.getLayoutInflater().inflate(R.layout.usercommentupdatebox, null);
                 alertDialog.setView(v);
                 final Button button1 = v.findViewById(R.id.button);
@@ -68,19 +73,14 @@ public class UserCommentAdapterView extends RecyclerView.Adapter<UserCommentAdap
                 button2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(activity, "Testing", Toast.LENGTH_SHORT).show();
+                        mDatabase = FirebaseDatabase.getInstance().getReference("Locations").child(location.getLocationId()).child("locationComments").child(String.valueOf(i));
+                        mDatabase.removeValue();
                     }
                 });
-                alertDialog.setTitle("Registration")
-                        .setMessage("Please complete the following"
+                alertDialog.setTitle("What do you want to do")
+                        .setMessage("Please Select the following"
                                 + "\n\n"
-                                + "Email & Password")
-                        .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                                + "Edit & Delete");
                 alertDialog.setView(v);
                 AlertDialog dialog = alertDialog.create();
                 dialog.show();
@@ -115,8 +115,6 @@ public class UserCommentAdapterView extends RecyclerView.Adapter<UserCommentAdap
             date = itemView.findViewById(R.id.newsUserDate);
             comment = itemView.findViewById(R.id.comment);
             image = itemView.findViewById(R.id.commentProfileImage);
-
-
         }
     }
 

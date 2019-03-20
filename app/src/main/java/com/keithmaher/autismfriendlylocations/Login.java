@@ -9,12 +9,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -28,11 +30,23 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 
-public class Login extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener{
+public class Login extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
 
+    private static RequestQueue mRequestQueue;
+    public GoogleSignInOptions mGoogleSignInOptions;
+    public static GoogleApiClient mGoogleApiClient;
+    public static boolean signedIn = false;
+    public static String googleToken;
+    public static String googleName;
+    public static String googleMail;
+    public static String googlePhotoURL;
+    static FirebaseAuth firebaseAuth;
+    static FirebaseUser firebaseUser;
     private static final int RC_SIGN_IN = 0;
     static EditText userEmail;
     static EditText userPassword;
@@ -41,6 +55,8 @@ public class Login extends BaseActivity implements GoogleApiClient.OnConnectionF
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
         setContentView(R.layout.loginbasefragment);
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         ViewPager mViewPager = findViewById(R.id.container);
@@ -260,6 +276,7 @@ public class Login extends BaseActivity implements GoogleApiClient.OnConnectionF
 
             OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
             if (opr.isDone()) {
+                Toast.makeText(getContext(), "Gathering your information", Toast.LENGTH_SHORT).show();
                 GoogleSignInResult result = opr.get();
                 handleSignInResult(result);
             } else {

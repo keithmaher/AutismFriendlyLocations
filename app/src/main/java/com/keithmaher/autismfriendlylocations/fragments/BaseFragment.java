@@ -10,6 +10,7 @@ import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.Utils.TinyDB;
 import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
+import com.keithmaher.autismfriendlylocations.models.News;
 
 import java.util.ArrayList;
 
@@ -19,6 +20,7 @@ public class BaseFragment extends Fragment {
     ArrayList<Location> databaseLocationList = new ArrayList<>();
     ArrayList<Comment> locationCommentList = new ArrayList<>();
     ArrayList<Comment> userCommentList = new ArrayList<>();
+    ArrayList<News> newsList = new ArrayList<>();
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
 
@@ -73,6 +75,15 @@ public class BaseFragment extends Fragment {
                 .commit();
     }
 
+    public static void newsFragment(FragmentActivity activity) {
+        NewsMainFragment newsfragement = new NewsMainFragment();
+        activity.getSupportFragmentManager().beginTransaction()
+                .replace(R.id.mainFragment, newsfragement)
+                .addToBackStack(null)
+                .commit();
+    }
+
+
     public static LocationAPIFragment locationFragment() {
         return new LocationAPIFragment();
     }
@@ -87,6 +98,10 @@ public class BaseFragment extends Fragment {
 
     public static LocationDatabaseFragment locationDatabaseFragment() {
         return new LocationDatabaseFragment();
+    }
+
+    public static MainNewsFragment newsFragment() {
+        return new MainNewsFragment();
     }
 
     public static LocationInformationFragment locationInfoFragment() {
