@@ -17,6 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.keithmaher.autismfriendlylocations.BaseActivity;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.adapters.LocationAdapterView;
 import com.keithmaher.autismfriendlylocations.models.Location;
@@ -27,10 +28,8 @@ public class LocationDatabaseFragment extends BaseFragment{
 
     LocationAdapterView adapter;
     GifImageView loading;
-    int position;
-
+    BaseActivity baseActivity;
     DatabaseReference mDatabase;
-
     RequestQueue mRequestQueue;
 
 
@@ -39,20 +38,31 @@ public class LocationDatabaseFragment extends BaseFragment{
 
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
         databaseLocationList.clear();
-        mRequestQueue = Volley.newRequestQueue(getContext());
+//        mRequestQueue = Volley.newRequestQueue(getContext());
+        baseActivity = (BaseActivity)getActivity();
 
-        getActivity().setTitle("Global List");
+        getActivity().setTitle("Friendly List");
 
-        final Bundle bundle = this.getArguments();
-        position = bundle.getInt("position");
-
-        final Bundle newBundle = new Bundle();
-        newBundle.putInt("position", position);
+//        final Bundle bundle = this.getArguments();
+//        position = bundle.getInt("position");
+//
+//        final Bundle newBundle = new Bundle();
+//        newBundle.putInt("position", position);
 
         View view = inflater.inflate(R.layout.recyclelistfragment, container, false);
         loading = view.findViewById(R.id.loadingGif2);
 
-        adapter = new LocationAdapterView(databaseLocationList, getActivity());
+        if (baseActivity.GPSLocationLNG != null) {
+
+            android.location.Location MylocationA = new android.location.Location("Location A");
+
+            MylocationA.setLatitude(Double.parseDouble(baseActivity.GPSLocationLAT));
+            MylocationA.setLongitude(Double.parseDouble(baseActivity.GPSLocationLNG));
+
+            adapter = new LocationAdapterView(databaseLocationList, getActivity(), MylocationA);
+        }else{
+            adapter = new LocationAdapterView(databaseLocationList, getActivity());
+        }
 
 
         RecyclerView mRecycler = view.findViewById(R.id.recycler);

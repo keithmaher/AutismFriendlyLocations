@@ -29,7 +29,8 @@ import java.util.Date;
 public class LocationInformationFragment extends BaseFragment {
 
     DatabaseReference mDatabase;
-    ArrayList<Comment> singleComment = new ArrayList<>();
+    DatabaseReference newDatabase;
+    DatabaseReference newCommentDatabase;
     String commentMain;
     EditText comment;
     TextView commentName;
@@ -40,8 +41,6 @@ public class LocationInformationFragment extends BaseFragment {
     @SuppressLint("RestrictedApi")
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        mDatabase = FirebaseDatabase.getInstance().getReference("Locations");
-
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         String userEmail = firebaseUser.getEmail();
@@ -49,6 +48,9 @@ public class LocationInformationFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.singlelocationinformationfragment, container, false);
 
         final Location location = getLocationObject(getContext());
+        mDatabase = FirebaseDatabase.getInstance().getReference("Locations");
+        newDatabase = FirebaseDatabase.getInstance().getReference("Comments").child(location.getLocationId()).push();
+        newCommentDatabase = FirebaseDatabase.getInstance().getReference("Comments");
 
         TextView name = view.findViewById(R.id.singleNameET);
         TextView address = view.findViewById(R.id.singleAddressET);
@@ -65,16 +67,13 @@ public class LocationInformationFragment extends BaseFragment {
 
     public void databaseCheckDB(final Location location, final FloatingActionButton addLocationButton, final String userEmail){
 
-        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+        newCommentDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @SuppressLint("RestrictedApi")
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-
-                if (snapshot.hasChild(location.getLocationId())) {
-
+                if (snapshot.hasChild(location.locationId)) {
                     addLocationButton.setVisibility(View.GONE);
-
                 }else{
                     addLocationButton.setVisibility(View.VISIBLE);
                     addLocationButton.setOnClickListener(new View.OnClickListener() {
@@ -101,13 +100,14 @@ public class LocationInformationFragment extends BaseFragment {
                                             } else {
                                                 Date cDate = new Date();
                                                 String fDate = new SimpleDateFormat("dd-MM-yyyy").format(cDate);
+
+                                                mDatabase.child(location.getLocationId()).setValue(new Location(location.getLocationId(), location.getLocationName(), location.getLocationLong(), location.getLocationLat(), location.getLocationAddress(), location.locationIcon));
                                                 if(firebaseUser.getPhotoUrl() != null) {
-                                                    singleComment.add(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString()));
+                                                    newDatabase.setValue(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString(), location.getLocationName()));
                                                 }else{
-                                                    singleComment.add(new Comment(userEmail, commentMain, fDate));
+                                                    newDatabase.setValue(new Comment(userEmail, commentMain, fDate, location.getLocationName()));
                                                 }
-                                                Location newLocation = new Location(location.getLocationId(), location.getLocationName(), location.getLocationLong(), location.getLocationLat(), location.getLocationAddress(), location.locationIcon, singleComment);
-                                                mDatabase.child(location.getLocationId()).setValue(newLocation);
+
                                                 BaseFragment.databaseLocationFragment(getActivity());
                                             }
                                         }

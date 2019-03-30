@@ -50,6 +50,21 @@
             app:layout_constraintStart_toStartOf="@+id/newsUserName"
             app:layout_constraintTop_toBottomOf="@+id/newsIcon" />
 
+        <TextView
+            android:id="@+id/newsLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/newsUserName"
+            android:layout_alignBottom="@+id/newsUserImg"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            android:text="Coffee Shop"
+            android:textColor="@color/black"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/newsUserName"
+            app:layout_constraintTop_toBottomOf="@+id/newsUserName" />
+
         <ImageView
             android:id="@+id/newsIcon"
             android:layout_width="0dp"
@@ -59,7 +74,7 @@
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/newsUserName"
+            app:layout_constraintTop_toBottomOf="@+id/newsLocation"
             tools:srcCompat="@tools:sample/avatars" />
     </android.support.constraint.ConstraintLayout>
 

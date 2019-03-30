@@ -3,6 +3,7 @@ package com.keithmaher.autismfriendlylocations;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -113,6 +115,17 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
             if (a == 1){
 
                 rootView = inflater.inflate(R.layout.loginfragmentone, container, false);
+                ImageView logo = rootView.findViewById(R.id.imageViewLogin);
+                logo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                        intent.setData(Uri.parse("http://www.autismservicesireland.com"));
+                        startActivity(intent);
+                    }
+                });
 
             }
 

@@ -67,6 +67,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:16.1.0'
     implementation 'com.google.maps.android:android-maps-utils:0.5+'
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
+    implementation 'com.github.mumayank:AirLocation:1.2'
+
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
+
+    // dexter runtime permissions
+    implementation 'com.karumi:dexter:4.2.0'
 
 
 }

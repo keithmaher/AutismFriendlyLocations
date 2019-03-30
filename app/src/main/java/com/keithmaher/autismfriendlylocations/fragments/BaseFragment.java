@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.keithmaher.autismfriendlylocations.BaseActivity;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.Utils.TinyDB;
 import com.keithmaher.autismfriendlylocations.models.Comment;
@@ -23,6 +24,7 @@ public class BaseFragment extends Fragment {
     ArrayList<News> newsList = new ArrayList<>();
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
+
 
     public Location getLocationObject(Context context) {
         TinyDB tinydb = new TinyDB(context);
@@ -59,13 +61,13 @@ public class BaseFragment extends Fragment {
                 .commit();
     }
 
-    public static void userCommentsFragment(FragmentActivity activity) {
-        UserCommentsFragment userCommentsFragment = new UserCommentsFragment();
-        activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.mainFragment, userCommentsFragment)
-                .addToBackStack(null)
-                .commit();
-    }
+//    public static void userCommentsFragment(FragmentActivity activity) {
+//        UserCommentsFragment userCommentsFragment = new UserCommentsFragment();
+//        activity.getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.mainFragment, userCommentsFragment)
+//                .addToBackStack(null)
+//                .commit();
+//    }
 
     public static void databaseLocationFragment(FragmentActivity activity) {
         DatabaseLocationFragment databaseLocationFragment = new DatabaseLocationFragment();
@@ -92,9 +94,9 @@ public class BaseFragment extends Fragment {
         return new LocationUserFragment();
     }
 
-    public static UserCommentsFragment commentsUserFragment() {
-        return new UserCommentsFragment();
-    }
+//    public static UserCommentsFragment commentsUserFragment() {
+//        return new UserCommentsFragment();
+//    }
 
     public static LocationDatabaseFragment locationDatabaseFragment() {
         return new LocationDatabaseFragment();

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -15,17 +16,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.keithmaher.autismfriendlylocations.R;
+import com.keithmaher.autismfriendlylocations.fragments.BaseFragment;
 import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -36,13 +40,11 @@ public class UserCommentAdapterView extends RecyclerView.Adapter<UserCommentAdap
     public List<Comment> commentList;
     FragmentActivity activity;
     DatabaseReference mDatabase;
-    Location location;
 
 
-    public UserCommentAdapterView(ArrayList<Comment> commentList, FragmentActivity activity, Location location) {
+    public UserCommentAdapterView(ArrayList<Comment> commentList, FragmentActivity activity) {
         this.commentList = commentList;
         this.activity = activity;
-        this.location = location;
 
     }
 
@@ -58,10 +60,14 @@ public class UserCommentAdapterView extends RecyclerView.Adapter<UserCommentAdap
     @Override
     public void onBindViewHolder(@NonNull final myViewHolder viewHolder, final int i) {
 
-        final Comment comment = commentList.get(i);
-        viewHolder.name.setText(comment.getCommentName());
-        viewHolder.date.setText(comment.getCommentDate());
-        viewHolder.comment.setText(comment.getCommentMain());
+        final Comment commentTest = commentList.get(i);
+        viewHolder.name.setText(commentTest.getCommentLocationName());
+        viewHolder.date.setText(commentTest.getCommentDate());
+        viewHolder.comment.setText(commentTest.getCommentMain());
+        if (commentTest.getCommentUserImageURL() != null) {
+            Picasso.get().load(commentTest.getCommentUserImageURL()).fit().into(viewHolder.image);
+        }
+
         viewHolder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,29 +76,150 @@ public class UserCommentAdapterView extends RecyclerView.Adapter<UserCommentAdap
                 alertDialog.setView(v);
                 final Button button1 = v.findViewById(R.id.button);
                 Button button2 = v.findViewById(R.id.button2);
-                button2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mDatabase = FirebaseDatabase.getInstance().getReference("Locations").child(location.getLocationId()).child("locationComments").child(String.valueOf(i));
-                        mDatabase.removeValue();
-                    }
-                });
                 alertDialog.setTitle("What do you want to do")
                         .setMessage("Please Select the following"
                                 + "\n\n"
                                 + "Edit & Delete");
                 alertDialog.setView(v);
-                AlertDialog dialog = alertDialog.create();
-                dialog.show();
+                final AlertDialog dialog1 = alertDialog.create();
+                dialog1.show();
+
+                button1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog1.dismiss();
+
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+                        v = activity.getLayoutInflater().inflate(R.layout.commentalertbox, null);
+                        alertDialog.setView(v);
+                        final EditText editCommentMain = v.findViewById(R.id.editTextComment);
+                        TextView editCommentName = v.findViewById(R.id.editTextName);
+                        editCommentName.setText(commentTest.getCommentName());
+                        editCommentMain.setText(commentTest.getCommentMain());
+                        alertDialog.setTitle("Editing Comment")
+                                .setMessage("Sorry that you made a mistake"
+                                        + "\n\n"
+                                        + "Don't let this happen again")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(final DialogInterface dialog, int which) {
+
+                                        final String updatedCommentMain = editCommentMain.getText().toString();
+
+                                        if (updatedCommentMain.isEmpty()) {
+                                            Toast.makeText(activity, "This can not be blank", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            mDatabase = FirebaseDatabase.getInstance().getReference("Comments");
+                                            ChildEventListener childEventListener = new ChildEventListener() {
+                                                @Override
+                                                public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                                                    final Iterable<DataSnapshot> contactChildren = dataSnapshot.getChildren();
+
+                                                    for (DataSnapshot contact : contactChildren) {
+                                                        Comment comment = contact.getValue(Comment.class);
+
+                                                        if (comment.getCommentMain().equals(commentTest.getCommentMain())) {
+                                                            mDatabase.child(dataSnapshot.getKey()).child(contact.getKey()).child("commentMain").setValue(updatedCommentMain);
+                                                            dialog.dismiss();
+                                                            BaseFragment.userLocationFragment(activity);
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                                                }
+
+                                                @Override
+                                                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                                }
+
+                                                @Override
+                                                public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) {
+                                                }
+                                            };
+
+                                            mDatabase.addChildEventListener(childEventListener);
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                });
+                        alertDialog.setView(v);
+                        AlertDialog dialog = alertDialog.create();
+                        dialog.show();
+                    }
+                });
+
+                button2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog1.dismiss();
+
+                        new AlertDialog.Builder(activity)
+                                .setTitle("Are You Sure")
+                                .setMessage("This can not be undone")
+                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(final DialogInterface dialog, int which) {
+
+                                        mDatabase = FirebaseDatabase.getInstance().getReference("Comments");
+                                        ChildEventListener childEventListener = new ChildEventListener() {
+                                            @Override
+                                            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                                                final Iterable<DataSnapshot> contactChildren = dataSnapshot.getChildren();
+
+                                                for (DataSnapshot contact : contactChildren) {
+                                                    Comment comment = contact.getValue(Comment.class);
+
+                                                    if (comment.getCommentMain().equals(commentTest.getCommentMain())) {
+                                                        mDatabase.child(dataSnapshot.getKey()).child(contact.getKey()).removeValue();
+                                                        dialog.dismiss();
+                                                        BaseFragment.userLocationFragment(activity);
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                                            }
+
+                                            @Override
+                                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                            }
+
+                                            @Override
+                                            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+                                            }
+                                        };
+
+                                        mDatabase.addChildEventListener(childEventListener);
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .show();
+                    }
+                });
             }
         });
-
-
-        if (comment.getCommentUserImageURL() != null) {
-            Picasso.get().load(comment.getCommentUserImageURL()).fit().into(viewHolder.image);
-        }
-
-
     }
 
     @Override

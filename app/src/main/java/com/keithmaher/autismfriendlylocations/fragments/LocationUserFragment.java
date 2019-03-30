@@ -19,25 +19,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.keithmaher.autismfriendlylocations.R;
-import com.keithmaher.autismfriendlylocations.adapters.LocationAdapterView;
-import com.keithmaher.autismfriendlylocations.adapters.UserLocationAdapterView;
+import com.keithmaher.autismfriendlylocations.adapters.UserCommentAdapterView;
 import com.keithmaher.autismfriendlylocations.models.Comment;
-import com.keithmaher.autismfriendlylocations.models.Location;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import pl.droidsonroids.gif.GifImageView;
 
 public class LocationUserFragment extends BaseFragment{
 
-    UserLocationAdapterView adapter;
+    UserCommentAdapterView adapter;
     GifImageView loading;
-    int position;
 
     DatabaseReference mDatabase;
 
@@ -54,13 +44,13 @@ public class LocationUserFragment extends BaseFragment{
         firebaseUser = firebaseAuth.getCurrentUser();
         mRequestQueue = Volley.newRequestQueue(getContext());
 
-        getActivity().setTitle("My List");
-
-        final Bundle bundle = this.getArguments();
-        position = bundle.getInt("position");
-
-        final Bundle newBundle = new Bundle();
-        newBundle.putInt("position", position);
+        getActivity().setTitle("My Comments");
+//
+//        final Bundle bundle = this.getArguments();
+//        position = bundle.getInt("position");
+//
+//        final Bundle newBundle = new Bundle();
+//        newBundle.putInt("position", position);
 
         View view = inflater.inflate(R.layout.recyclelistfragment, container, false);
         loading = view.findViewById(R.id.loadingGif2);
@@ -71,7 +61,7 @@ public class LocationUserFragment extends BaseFragment{
 //            Toast.makeText(getContext(), databaseLocationList.get(a).locationName+" "+a, Toast.LENGTH_SHORT).show();
 //        }
 
-        adapter = new UserLocationAdapterView(databaseLocationList, getActivity());
+        adapter = new UserCommentAdapterView(userCommentList, getActivity());
 
 
         RecyclerView mRecycler = view.findViewById(R.id.recycler);
@@ -85,25 +75,44 @@ public class LocationUserFragment extends BaseFragment{
         return view;
     }
 
+//    public void testing() {
+//        Toast.makeText(getContext(), "Testing", Toast.LENGTH_SHORT).show();
+//    }
+
 
     public void locationDatabase(final GifImageView loading) {
-        databaseLocationList.clear();
-        mDatabase = FirebaseDatabase.getInstance().getReference("Locations");
+        userCommentList.clear();
+        mDatabase = FirebaseDatabase.getInstance().getReference("Comments");
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                Location location = dataSnapshot.getValue(Location.class);
-                if (location.getLocationComments() != null) {
-                    for (int i = 0; i < location.getLocationComments().size(); i++) {
-                        if(location.getLocationComments().get(i) == null){
-                            continue;
-                        }else if(location.getLocationComments().get(i).getCommentName().equals(firebaseUser.getEmail())) {
-                            databaseLocationList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
-                            adapter.notifyDataSetChanged();
-                            loading.setVisibility(View.GONE);
-                        }
+
+//                String key = dataSnapshot.getKey();
+
+                final Iterable<DataSnapshot> contactChildren = dataSnapshot.getChildren();
+
+                for (DataSnapshot contact : contactChildren){
+                    Comment comment = contact.getValue(Comment.class);
+
+                    if (comment.getCommentName().equals(firebaseUser.getEmail())){
+                        userCommentList.add(new Comment(comment.getCommentName(),comment.getCommentMain(), comment.getCommentDate(), comment.getCommentLocationName()));
+                        adapter.notifyDataSetChanged();
+                        loading.setVisibility(View.GONE);
                     }
                 }
+
+
+//                if (location.getLocationComments() != null) {
+//                    for (int i = 0; i < location.getLocationComments().size(); i++) {
+//                        if(location.getLocationComments().get(i) == null){
+//                            continue;
+//                        }else if(location.getLocationComments().get(i).getCommentName().equals(firebaseUser.getEmail())) {
+//                            databaseLocationList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
+//                            adapter.notifyDataSetChanged();
+//                            loading.setVisibility(View.GONE);
+//                        }
+//                    }
+//                }
             }
 
             @Override

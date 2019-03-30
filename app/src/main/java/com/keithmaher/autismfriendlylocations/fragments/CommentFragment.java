@@ -39,10 +39,11 @@ import pl.droidsonroids.gif.GifImageView;
 
 public class CommentFragment extends BaseFragment {
 
+    DatabaseReference mDatabase;
+    DatabaseReference newDatabase;
     List<Comment> singleComment = new ArrayList<>();
     CommentAdapterView adapter;
     GifImageView loading;
-    DatabaseReference mDatabase;
     FloatingActionButton addCommentButton;
     String commentMain;
     EditText comment;
@@ -64,6 +65,7 @@ public class CommentFragment extends BaseFragment {
 
         String locationId = location.getLocationId();
 
+        newDatabase = FirebaseDatabase.getInstance().getReference("Comments").child(location.getLocationId()).push();
 
         View view = inflater.inflate(R.layout.singlelocationcommentfragment, container, false);
         noCommentText = view.findViewById(R.id.noCommentText);
@@ -132,29 +134,35 @@ public class CommentFragment extends BaseFragment {
                                 } else {
                                     Date cDate = new Date();
                                     String fDate = new SimpleDateFormat("dd-MM-yyyy").format(cDate);
-                                    singleComment = location.getLocationComments();
-                                    if (location.getLocationComments() == null){
-                                        singleComment = locationCommentList;
-                                        if(firebaseUser.getPhotoUrl() != null) {
-                                            singleComment.add(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString()));
-                                        }else{
-                                            singleComment.add(new Comment(userEmail, commentMain, fDate));
-                                        }
-                                        mDatabase.setValue(singleComment);
-                                        TinyDB tinydb = new TinyDB(getContext());
-                                        tinydb.putObject("concertObj", location);
-                                        BaseFragment.singleLocationFragment(getActivity());
+
+                                    if(firebaseUser.getPhotoUrl() != null) {
+                                        newDatabase.setValue(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString(), location.getLocationName()));
                                     }else{
-                                        if (firebaseUser.getPhotoUrl() != null){
-                                            singleComment.add(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString()));
-                                        }else{
-                                            singleComment.add(new Comment(userEmail, commentMain, fDate));
-                                        }
+                                        newDatabase.setValue(new Comment(userEmail, commentMain, fDate, location.getLocationName()));
+                                    }
+
+//                                    if (location.getLocationComments() == null){
+//                                        singleComment = locationCommentList;
+//                                        if(firebaseUser.getPhotoUrl() != null) {
+//                                            singleComment.add(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString()));
+//                                        }else{
+//                                            singleComment.add(new Comment(userEmail, commentMain, fDate));
+//                                        }
+//                                        mDatabase.setValue(singleComment);
+//                                        TinyDB tinydb = new TinyDB(getContext());
+//                                        tinydb.putObject("concertObj", location);
+//                                        BaseFragment.singleLocationFragment(getActivity());
+//                                    }else{
+//                                        if (firebaseUser.getPhotoUrl() != null){
+//                                            singleComment.add(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString()));
+//                                        }else{
+//                                            singleComment.add(new Comment(userEmail, commentMain, fDate));
+//                                        }
 
 //                                      Location newLocation = new Location(location.getLocationId(), location.getLocationName(), location.getLocationLong(), location.getLocationLat(), location.getLocationAddress(), location.locationIcon, singleComment);
-                                        mDatabase.setValue(singleComment);
+//                                        mDatabase.setValue(singleComment);
 //                                      BaseFragment.databaseLocationFragment(getActivity());
-                                    }
+//                                    }
                                 }
                             }
                         })
@@ -174,16 +182,16 @@ public class CommentFragment extends BaseFragment {
     private void locationComments(final GifImageView loading, final String locationId) {
 
         locationCommentList.clear();
-        mDatabase = FirebaseDatabase.getInstance().getReference("Locations").child(locationId).child("locationComments");
+        mDatabase = FirebaseDatabase.getInstance().getReference("Comments").child(locationId);
         ChildEventListener childEventListener = new ChildEventListener() {
             @SuppressLint("RestrictedApi")
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                 Comment comment = dataSnapshot.getValue(Comment.class);
                 if (comment.commentUserImageURL == null){
-                    locationCommentList.add(new Comment(comment.commentName, comment.commentMain, comment.commentDate));
+                    locationCommentList.add(new Comment(comment.commentName, comment.commentMain, comment.commentDate, comment.commentLocationName));
                 }else {
-                    locationCommentList.add(new Comment(comment.commentName, comment.commentMain, comment.commentDate, comment.commentUserImageURL));
+                    locationCommentList.add(new Comment(comment.commentName, comment.commentMain, comment.commentDate, comment.commentUserImageURL, comment.commentLocationName));
                 }
                 adapter.notifyDataSetChanged();
                 loading.setVisibility(View.GONE);

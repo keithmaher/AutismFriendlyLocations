@@ -47,7 +47,8 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
 
         final News news = locationList.get(i);
         viewHolder.name.setText(news.getNewsName());
-        viewHolder.date.setText(news.getNewsDate());
+        viewHolder.date.setText("Date added: "+news.getNewsDate());
+        viewHolder.location.setText("Commented on "+news.getNewsLocation());
         Picasso.get().load(news.getNewsImg()).fit().into(viewHolder.image);
 //        viewHolder.card.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -69,6 +70,7 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
     class myViewHolder extends RecyclerView.ViewHolder {
         private TextView name;
         private TextView date;
+        private TextView location;
         private ImageView image;
         private CardView card;
 
@@ -78,6 +80,7 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
             name = itemView.findViewById(R.id.newsUserName);
             date = itemView.findViewById(R.id.newsUserDate);
             card = itemView.findViewById(R.id.cardId);
+            location = itemView.findViewById(R.id.newsLocation);
 
 
         }

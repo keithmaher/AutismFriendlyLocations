@@ -3,12 +3,16 @@ package com.keithmaher.autismfriendlylocations;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -30,43 +34,71 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.google.firebase.database.annotations.NotNull;
 import com.keithmaher.autismfriendlylocations.fragments.BaseFragment;
-import com.keithmaher.autismfriendlylocations.fragments.CommentFragment;
-import com.keithmaher.autismfriendlylocations.fragments.NewsMainFragment;
-
-import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import mumayank.com.airlocationlibrary.AirLocation;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
 
     private static RequestQueue mRequestQueue;
     public GoogleSignInOptions mGoogleSignInOptions;
     public static GoogleApiClient mGoogleApiClient;
-
-    public static boolean signedIn = false;
-    public static String googleToken;
-    public static String googleName;
-    public static String googleMail;
-    public static String googlePhotoURL;
     public CircleImageView googlePhoto;
     public static Bitmap googlePhoto1;
     static FirebaseAuth firebaseAuth;
     static FirebaseUser firebaseUser;
+    public String GPSLocationLAT;
+    public String GPSLocationLNG;
+    private AirLocation airLocation;
+    private static final int REQUEST_LOCATION = 123;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                getGPS();
+            }
+        });
+
+        task.addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    // Location settings are not satisfied, but this can be fixed
+                    // by showing the user a dialog.
+                    try {
+                        // Show the dialog by calling startResolutionForResult(),
+                        // and check the result in onActivityResult().
+                        ResolvableApiException resolvable = (ResolvableApiException) e;
+                        resolvable.startResolutionForResult(BaseActivity.this, REQUEST_LOCATION);
+                    } catch (IntentSender.SendIntentException sendEx) {
+                        // Ignore the error.
+                    }
+                }
+            }
+        });
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
@@ -105,6 +137,36 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         }
 
         BaseFragment.newsFragment(this);
+    }
+
+    public void getGPS(){
+        airLocation = new AirLocation(this, true, true, new AirLocation.Callbacks() {
+            @Override
+            public void onSuccess(@NotNull Location location) {
+                GPSLocationLAT = String.valueOf(location.getLatitude());
+                GPSLocationLNG = String.valueOf(location.getLongitude());
+            }
+
+            @Override
+            public void onFailed(@NotNull AirLocation.LocationFailedEnum locationFailedEnum) {
+                // do something
+            }
+        });
+    }
+
+    // override and call airLocation object's method by the same name
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        airLocation.onActivityResult(requestCode, resultCode, data);
+    }
+
+    // override and call airLocation object's method by the same name
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        airLocation.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
     }
 
 
@@ -254,28 +316,6 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         BaseActivity.add(imgRequest);
     }
 
-//    public static void uploadImage(Uri url) {
-//
-//        storageReference.putFile(url)
-//                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                    }
-//                })
-//                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-//                    }
-//                });
-//    }
-
-
-
     public static <T> void add(Request<T> req) {
         getRequestQueue().add(req);
     }
@@ -286,6 +326,6 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
+
 }

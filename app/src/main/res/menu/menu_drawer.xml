@@ -12,15 +12,15 @@
         <item
             android:id="@+id/nav_search"
             android:icon="@drawable/mylist"
-            android:title="Global List" />
+            android:title="Friendly List" />
         <item
             android:id="@+id/nav_my_search"
-            android:icon="@drawable/mylist"
-            android:title="My List" />
+            android:icon="@drawable/comments"
+            android:title="My Comments" />
         <item
             android:id="@+id/nav_add"
             android:icon="@drawable/search"
-            android:title="Search All Locations" />
+            android:title="Search Locally" />
     </group>
 
     <item android:title="Settings">

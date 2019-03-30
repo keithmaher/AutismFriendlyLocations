@@ -1,12 +1,16 @@
 package com.keithmaher.autismfriendlylocations.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -14,7 +18,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.keithmaher.autismfriendlylocations.BaseActivity;
+import com.keithmaher.autismfriendlylocations.Login;
 import com.keithmaher.autismfriendlylocations.R;
+import com.keithmaher.autismfriendlylocations.SplashScreen;
 import com.keithmaher.autismfriendlylocations.adapters.LocationAdapterView;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
@@ -28,7 +35,6 @@ public class LocationAPIFragment extends BaseFragment{
 
     LocationAdapterView adapter;
     GifImageView loading;
-    int position;
     public static String locationName;
     public static String locationId;
     public static String locationRoad;
@@ -36,6 +42,7 @@ public class LocationAPIFragment extends BaseFragment{
     public static String locationState;
     public static double locationLng;
     public static double locationLat;
+    BaseActivity baseActivity;
 
     RequestQueue mRequestQueue;
 
@@ -45,20 +52,27 @@ public class LocationAPIFragment extends BaseFragment{
 
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
 
+        baseActivity = (BaseActivity)getActivity();
+
         mRequestQueue = Volley.newRequestQueue(getContext());
 
-        getActivity().setTitle("Search All Locations");
 
-        final Bundle bundle = this.getArguments();
-        position = bundle.getInt("position");
+        getActivity().setTitle("Search Locally");
 
-        final Bundle newBundle = new Bundle();
-        newBundle.putInt("position", position);
+        if (baseActivity.GPSLocationLNG != null) {
+
+            android.location.Location MylocationA = new android.location.Location("Location A");
+
+            MylocationA.setLatitude(Double.parseDouble(baseActivity.GPSLocationLAT));
+            MylocationA.setLongitude(Double.parseDouble(baseActivity.GPSLocationLNG));
+
+            adapter = new LocationAdapterView(apiLocationList, getActivity(), MylocationA);
+        }else{
+            adapter = new LocationAdapterView(apiLocationList, getActivity());
+        }
 
         View view = inflater.inflate(R.layout.recyclelistfragment, container, false);
         loading = view.findViewById(R.id.loadingGif2);
-
-        adapter = new LocationAdapterView(apiLocationList, getActivity());
 
         RecyclerView mRecycler = view.findViewById(R.id.recycler);
         mRecycler.setAdapter(adapter);
@@ -74,8 +88,15 @@ public class LocationAPIFragment extends BaseFragment{
     public void locationAPI(final GifImageView loading) {
 
         apiLocationList.clear();
+        String url;
 
-        String url = "https://api.foursquare.com/v2/venues/search?near=Dublin,IE&v=28012019&limit=10&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
+        if (baseActivity.GPSLocationLNG == null) {
+//            url = "";
+            url = "https://api.foursquare.com/v2/venues/search?near=Ireland,IE&v=28012019&limit=50&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
+        }else{
+            url = "https://api.foursquare.com/v2/venues/search?ll="+baseActivity.GPSLocationLAT+","+baseActivity.GPSLocationLNG+"&v=28012019&limit=50&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
+        }
+
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
 
             @Override

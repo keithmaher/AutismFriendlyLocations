@@ -10,15 +10,25 @@ public class News extends Location {
     public String newsMain;
     public String newsDate;
     public String newsImg;
+    public String newsLocation;
 
     public News() {
     }
 
-    public News(String newsName, String newsDate, String newsImg) {
+    public News(String newsName, String newsDate, String newsImg, String newsLocation) {
         this.newsId = UUID.randomUUID().toString();
         this.newsName = newsName;
         this.newsDate = newsDate;
         this.newsImg = newsImg;
+        this.newsLocation = newsLocation;
+    }
+
+    public String getNewsLocation() {
+        return newsLocation;
+    }
+
+    public void setNewsLocation(String newsLocation) {
+        this.newsLocation = newsLocation;
     }
 
     public String getNewsId() {

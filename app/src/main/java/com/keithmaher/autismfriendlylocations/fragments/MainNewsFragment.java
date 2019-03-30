@@ -3,6 +3,7 @@ package com.keithmaher.autismfriendlylocations.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.adapters.LocationAdapterView;
 import com.keithmaher.autismfriendlylocations.adapters.NewsAdapterView;
+import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 import com.keithmaher.autismfriendlylocations.models.News;
 
@@ -65,22 +67,19 @@ public class MainNewsFragment extends BaseFragment{
 
     public void locationDatabase(final GifImageView loading) {
         newsList.clear();
-        mDatabase = FirebaseDatabase.getInstance().getReference("Locations");
+        mDatabase = FirebaseDatabase.getInstance().getReference("Comments");
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                Location location = dataSnapshot.getValue(Location.class);
-                if (location.getLocationComments() != null) {
-                    for (int i = 0; i < location.getLocationComments().size(); i++) {
-                        if(location.getLocationComments().get(i) == null){
-                            continue;
-                        }else {
-                            newsList.add(new News(location.locationComments.get(i).getCommentName(), location.getLocationComments().get(i).getCommentDate(), location.getLocationComments().get(i).commentUserImageURL));
+                final Iterable<DataSnapshot> contactChildren = dataSnapshot.getChildren();
 
-                            loading.setVisibility(View.GONE);
-                        }
-                    }
+                for (DataSnapshot contact : contactChildren){
+                    Comment comment = contact.getValue(Comment.class);
+
+                    newsList.add(new News(comment.getCommentName(), comment.getCommentDate(), comment.getCommentUserImageURL(), comment.getCommentLocationName()));
                     adapter.notifyDataSetChanged();
+                    loading.setVisibility(View.GONE);
+
                 }
             }
 
