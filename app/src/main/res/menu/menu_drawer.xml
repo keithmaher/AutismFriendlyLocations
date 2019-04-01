@@ -25,8 +25,12 @@
 
     <item android:title="Settings">
         <menu>
-            <group
-                android:id="@+id/group3">
+            <group android:id="@+id/group3"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/searchSettings"
+                    android:icon="@drawable/settings"
+                    android:title="Search Settings" />
                 <item
                     android:id="@+id/menu_signout"
                     android:icon="@drawable/logout"

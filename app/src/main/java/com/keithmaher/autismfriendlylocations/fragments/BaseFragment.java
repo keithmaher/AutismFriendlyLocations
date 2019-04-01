@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.keithmaher.autismfriendlylocations.BaseActivity;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.Utils.TinyDB;
 import com.keithmaher.autismfriendlylocations.models.Comment;
@@ -28,13 +27,8 @@ public class BaseFragment extends Fragment {
 
     public Location getLocationObject(Context context) {
         TinyDB tinydb = new TinyDB(context);
-        return tinydb.getObject("concertObj", Location.class);
+        return tinydb.getObject("locationObj", Location.class);
     }
-
-//    public void saveLocationObject(Location location) {
-//        TinyDB tinydb = new TinyDB(getContext());
-//        tinydb.putObject("concertObj", location);
-//    }
 
 
     public static void singleLocationFragment(FragmentActivity activity) {
@@ -61,13 +55,13 @@ public class BaseFragment extends Fragment {
                 .commit();
     }
 
-//    public static void userCommentsFragment(FragmentActivity activity) {
-//        UserCommentsFragment userCommentsFragment = new UserCommentsFragment();
-//        activity.getSupportFragmentManager().beginTransaction()
-//                .replace(R.id.mainFragment, userCommentsFragment)
-//                .addToBackStack(null)
-//                .commit();
-//    }
+    public static void searchFragment(FragmentActivity activity) {
+        SearchFragment searchFragment = new SearchFragment();
+        activity.getSupportFragmentManager().beginTransaction()
+                .replace(R.id.mainFragment, searchFragment)
+                .addToBackStack(null)
+                .commit();
+    }
 
     public static void databaseLocationFragment(FragmentActivity activity) {
         DatabaseLocationFragment databaseLocationFragment = new DatabaseLocationFragment();
@@ -94,9 +88,9 @@ public class BaseFragment extends Fragment {
         return new LocationUserFragment();
     }
 
-//    public static UserCommentsFragment commentsUserFragment() {
-//        return new UserCommentsFragment();
-//    }
+    public static MainSearchFragment mainSearchFragment() {
+        return new MainSearchFragment();
+    }
 
     public static LocationDatabaseFragment locationDatabaseFragment() {
         return new LocationDatabaseFragment();
@@ -112,7 +106,6 @@ public class BaseFragment extends Fragment {
 
     public static CommentFragment commentFragment() {
         return new CommentFragment();
-
     }
 
 }

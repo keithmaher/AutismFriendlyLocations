@@ -50,14 +50,6 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
         viewHolder.date.setText("Date added: "+news.getNewsDate());
         viewHolder.location.setText("Commented on "+news.getNewsLocation());
         Picasso.get().load(news.getNewsImg()).fit().into(viewHolder.image);
-//        viewHolder.card.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                TinyDB tinydb = new TinyDB(activity);
-//                tinydb.putObject("concertObj", news);
-//                BaseFragment.singleLocationFragment(activity);
-//            }
-//        });
 
     }
 

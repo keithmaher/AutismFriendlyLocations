@@ -23,7 +23,6 @@ import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class LocationInformationFragment extends BaseFragment {

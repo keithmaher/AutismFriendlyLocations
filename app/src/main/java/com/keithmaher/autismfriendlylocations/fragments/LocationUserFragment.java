@@ -1,6 +1,7 @@
 package com.keithmaher.autismfriendlylocations.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -30,7 +32,7 @@ public class LocationUserFragment extends BaseFragment{
     GifImageView loading;
 
     DatabaseReference mDatabase;
-
+    TextView noComments;
     RequestQueue mRequestQueue;
 
 
@@ -45,39 +47,39 @@ public class LocationUserFragment extends BaseFragment{
         mRequestQueue = Volley.newRequestQueue(getContext());
 
         getActivity().setTitle("My Comments");
-//
-//        final Bundle bundle = this.getArguments();
-//        position = bundle.getInt("position");
-//
-//        final Bundle newBundle = new Bundle();
-//        newBundle.putInt("position", position);
 
         View view = inflater.inflate(R.layout.recyclelistfragment, container, false);
         loading = view.findViewById(R.id.loadingGif2);
-
+        noComments = view.findViewById(R.id.noLocationText);
+        noComments.setVisibility(View.GONE);
         locationDatabase(loading);
 
-//        for(int a = 0; a < databaseLocationList.size(); a++){
-//            Toast.makeText(getContext(), databaseLocationList.get(a).locationName+" "+a, Toast.LENGTH_SHORT).show();
-//        }
-
         adapter = new UserCommentAdapterView(userCommentList, getActivity());
-
 
         RecyclerView mRecycler = view.findViewById(R.id.recycler);
         mRecycler.setAdapter(adapter);
 
-
-
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecycler.setLayoutManager(mLayoutManager);
 
+
+        Runnable progressRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                loading.setVisibility(View.GONE);
+                if (userCommentList.isEmpty()) {
+                    noComments.setVisibility(View.VISIBLE);
+                }
+                noComments.setText("You have no comments");
+            }
+        };
+
+        Handler pdCanceller = new Handler();
+        pdCanceller.postDelayed(progressRunnable, 5000);
+
         return view;
     }
-
-//    public void testing() {
-//        Toast.makeText(getContext(), "Testing", Toast.LENGTH_SHORT).show();
-//    }
 
 
     public void locationDatabase(final GifImageView loading) {
@@ -86,8 +88,6 @@ public class LocationUserFragment extends BaseFragment{
         ChildEventListener childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-
-//                String key = dataSnapshot.getKey();
 
                 final Iterable<DataSnapshot> contactChildren = dataSnapshot.getChildren();
 
@@ -100,19 +100,6 @@ public class LocationUserFragment extends BaseFragment{
                         loading.setVisibility(View.GONE);
                     }
                 }
-
-
-//                if (location.getLocationComments() != null) {
-//                    for (int i = 0; i < location.getLocationComments().size(); i++) {
-//                        if(location.getLocationComments().get(i) == null){
-//                            continue;
-//                        }else if(location.getLocationComments().get(i).getCommentName().equals(firebaseUser.getEmail())) {
-//                            databaseLocationList.add(new Location(location.locationId, location.locationName, location.locationLong, location.locationLat, location.locationAddress, location.locationIcon, location.locationComments));
-//                            adapter.notifyDataSetChanged();
-//                            loading.setVisibility(View.GONE);
-//                        }
-//                    }
-//                }
             }
 
             @Override

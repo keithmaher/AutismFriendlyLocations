@@ -4,21 +4,19 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -54,6 +52,7 @@ import mumayank.com.airlocationlibrary.AirLocation;
 
 public class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener {
 
+    public DrawerLayout drawer;
     private static RequestQueue mRequestQueue;
     public GoogleSignInOptions mGoogleSignInOptions;
     public static GoogleApiClient mGoogleApiClient;
@@ -65,11 +64,18 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
     public String GPSLocationLNG;
     private AirLocation airLocation;
     private static final int REQUEST_LOCATION = 123;
+    public SharedPreferences mPreference;
+    public SharedPreferences.Editor mEditor;
+    public NavigationView navigationView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        BaseFragment.newsFragment(this);
+
+        mPreference = PreferenceManager.getDefaultSharedPreferences(this);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         SettingsClient client = LocationServices.getSettingsClient(this);
@@ -109,15 +115,13 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById(R.id.toolbar1);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-//        Menu nav_Menu = navigationView.getMenu();
 
         View userView = navigationView.getHeaderView(0);
 
@@ -135,8 +139,6 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             TextView googleMail = userView.findViewById(R.id.navEmail);
             googleMail.setText(firebaseUser.getEmail());
         }
-
-        BaseFragment.newsFragment(this);
     }
 
     public void getGPS(){
@@ -186,26 +188,6 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-            getMenuInflater().inflate(R.menu.top_menu, menu);
-            return true;
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-
-        if (id == R.id.searchSettings) {
-
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -223,6 +205,8 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
             menuSignOut();
         }else if (id == R.id.nav_my_search){
             BaseFragment.userLocationFragment(this);
+        }else if (id == R.id.searchSettings){
+            BaseFragment.searchFragment(this);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -236,7 +220,7 @@ public class BaseActivity extends AppCompatActivity implements NavigationView.On
 
         new AlertDialog.Builder(this)
                 .setTitle("Don't Go")
-                .setMessage("We are sorry to see you leave\nCome back soon")
+                .setMessage("Please\nCome back soon")
                 .setPositiveButton("Logout", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

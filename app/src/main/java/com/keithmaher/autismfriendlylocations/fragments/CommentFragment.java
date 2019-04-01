@@ -41,7 +41,6 @@ public class CommentFragment extends BaseFragment {
 
     DatabaseReference mDatabase;
     DatabaseReference newDatabase;
-    List<Comment> singleComment = new ArrayList<>();
     CommentAdapterView adapter;
     GifImageView loading;
     FloatingActionButton addCommentButton;
@@ -140,29 +139,6 @@ public class CommentFragment extends BaseFragment {
                                     }else{
                                         newDatabase.setValue(new Comment(userEmail, commentMain, fDate, location.getLocationName()));
                                     }
-
-//                                    if (location.getLocationComments() == null){
-//                                        singleComment = locationCommentList;
-//                                        if(firebaseUser.getPhotoUrl() != null) {
-//                                            singleComment.add(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString()));
-//                                        }else{
-//                                            singleComment.add(new Comment(userEmail, commentMain, fDate));
-//                                        }
-//                                        mDatabase.setValue(singleComment);
-//                                        TinyDB tinydb = new TinyDB(getContext());
-//                                        tinydb.putObject("concertObj", location);
-//                                        BaseFragment.singleLocationFragment(getActivity());
-//                                    }else{
-//                                        if (firebaseUser.getPhotoUrl() != null){
-//                                            singleComment.add(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString()));
-//                                        }else{
-//                                            singleComment.add(new Comment(userEmail, commentMain, fDate));
-//                                        }
-
-//                                      Location newLocation = new Location(location.getLocationId(), location.getLocationName(), location.getLocationLong(), location.getLocationLat(), location.getLocationAddress(), location.locationIcon, singleComment);
-//                                        mDatabase.setValue(singleComment);
-//                                      BaseFragment.databaseLocationFragment(getActivity());
-//                                    }
                                 }
                             }
                         })
@@ -196,7 +172,6 @@ public class CommentFragment extends BaseFragment {
                 adapter.notifyDataSetChanged();
                 loading.setVisibility(View.GONE);
                 addCommentButton.setVisibility(View.VISIBLE);
-//              singleNews.add(new News(location.locationComments.get(0).commentName, location.locationName, location.locationComments.get(0).commentDate, location.locationIcon));
             }
 
             @Override

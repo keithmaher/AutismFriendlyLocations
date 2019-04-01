@@ -1,6 +1,7 @@
 package com.keithmaher.autismfriendlylocations.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -30,7 +32,7 @@ public class LocationDatabaseFragment extends BaseFragment{
     GifImageView loading;
     BaseActivity baseActivity;
     DatabaseReference mDatabase;
-    RequestQueue mRequestQueue;
+    TextView noLocation;
 
 
     public LocationDatabaseFragment() {
@@ -38,19 +40,13 @@ public class LocationDatabaseFragment extends BaseFragment{
 
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, Bundle savedInstanceState) {
         databaseLocationList.clear();
-//        mRequestQueue = Volley.newRequestQueue(getContext());
         baseActivity = (BaseActivity)getActivity();
 
         getActivity().setTitle("Friendly List");
-
-//        final Bundle bundle = this.getArguments();
-//        position = bundle.getInt("position");
-//
-//        final Bundle newBundle = new Bundle();
-//        newBundle.putInt("position", position);
-
         View view = inflater.inflate(R.layout.recyclelistfragment, container, false);
         loading = view.findViewById(R.id.loadingGif2);
+        noLocation = view.findViewById(R.id.noLocationText);
+        noLocation.setVisibility(View.GONE);
 
         if (baseActivity.GPSLocationLNG != null) {
 
@@ -64,7 +60,6 @@ public class LocationDatabaseFragment extends BaseFragment{
             adapter = new LocationAdapterView(databaseLocationList, getActivity());
         }
 
-
         RecyclerView mRecycler = view.findViewById(R.id.recycler);
         mRecycler.setAdapter(adapter);
 
@@ -72,6 +67,22 @@ public class LocationDatabaseFragment extends BaseFragment{
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecycler.setLayoutManager(mLayoutManager);
+
+        Runnable progressRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                loading.setVisibility(View.GONE);
+                if (databaseLocationList.isEmpty()) {
+                    noLocation.setVisibility(View.VISIBLE);
+                }
+                noLocation.setText("No Location added yet");
+            }
+        };
+
+        Handler pdCanceller = new Handler();
+        pdCanceller.postDelayed(progressRunnable, 5000);
+
 
         return view;
     }

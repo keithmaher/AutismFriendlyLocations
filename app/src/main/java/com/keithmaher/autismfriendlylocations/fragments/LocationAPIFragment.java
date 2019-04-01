@@ -1,16 +1,14 @@
 package com.keithmaher.autismfriendlylocations.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,9 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.keithmaher.autismfriendlylocations.BaseActivity;
-import com.keithmaher.autismfriendlylocations.Login;
 import com.keithmaher.autismfriendlylocations.R;
-import com.keithmaher.autismfriendlylocations.SplashScreen;
 import com.keithmaher.autismfriendlylocations.adapters.LocationAdapterView;
 import com.keithmaher.autismfriendlylocations.models.Location;
 
@@ -43,7 +39,7 @@ public class LocationAPIFragment extends BaseFragment{
     public static double locationLng;
     public static double locationLat;
     BaseActivity baseActivity;
-
+    TextView noLocation;
     RequestQueue mRequestQueue;
 
 
@@ -54,8 +50,9 @@ public class LocationAPIFragment extends BaseFragment{
 
         baseActivity = (BaseActivity)getActivity();
 
-        mRequestQueue = Volley.newRequestQueue(getContext());
+        baseActivity.getGPS();
 
+        mRequestQueue = Volley.newRequestQueue(getContext());
 
         getActivity().setTitle("Search Locally");
 
@@ -73,7 +70,8 @@ public class LocationAPIFragment extends BaseFragment{
 
         View view = inflater.inflate(R.layout.recyclelistfragment, container, false);
         loading = view.findViewById(R.id.loadingGif2);
-
+        noLocation = view.findViewById(R.id.noLocationText);
+        noLocation.setVisibility(View.GONE);
         RecyclerView mRecycler = view.findViewById(R.id.recycler);
         mRecycler.setAdapter(adapter);
 
@@ -81,6 +79,22 @@ public class LocationAPIFragment extends BaseFragment{
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mRecycler.setLayoutManager(mLayoutManager);
+
+
+        Runnable progressRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                loading.setVisibility(View.GONE);
+                if (apiLocationList.isEmpty()) {
+                    noLocation.setVisibility(View.VISIBLE);
+                }
+                noLocation.setText("No locations\nExpand your search");
+            }
+        };
+
+        Handler pdCanceller = new Handler();
+        pdCanceller.postDelayed(progressRunnable, 5000);
 
         return view;
     }
@@ -90,11 +104,20 @@ public class LocationAPIFragment extends BaseFragment{
         apiLocationList.clear();
         String url;
 
-        if (baseActivity.GPSLocationLNG == null) {
-//            url = "";
-            url = "https://api.foursquare.com/v2/venues/search?near=Ireland,IE&v=28012019&limit=50&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
+        Boolean prefCheck = baseActivity.mPreference.getBoolean("location", true);
+        String prefName = baseActivity.mPreference.getString("name", "");
+        String prefQuery = baseActivity.mPreference.getString("query", "");
+        int prefLimit = baseActivity.mPreference.getInt("limit", 5);
+        int prefRadius = baseActivity.mPreference.getInt("radius", 5);
+        prefRadius = prefRadius*1000;
+        if (!prefName.isEmpty()){
+            prefName = prefName+",IE";
+        }
+
+        if (prefCheck){
+            url = "https://api.foursquare.com/v2/venues/search?ll="+baseActivity.GPSLocationLAT+","+baseActivity.GPSLocationLNG+"&radius="+prefRadius+"&query="+prefQuery+"&v=28012019&limit="+prefLimit+"&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
         }else{
-            url = "https://api.foursquare.com/v2/venues/search?ll="+baseActivity.GPSLocationLAT+","+baseActivity.GPSLocationLNG+"&v=28012019&limit=50&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
+            url = "https://api.foursquare.com/v2/venues/search?near="+prefName+"&query="+prefQuery+"&radius="+prefRadius+"&v=28012019&limit="+prefLimit+"&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
         }
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {

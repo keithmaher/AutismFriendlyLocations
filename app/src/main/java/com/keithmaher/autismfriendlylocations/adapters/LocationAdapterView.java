@@ -81,7 +81,7 @@ public class LocationAdapterView extends RecyclerView.Adapter<LocationAdapterVie
             @Override
             public void onClick(View v) {
                 TinyDB tinydb = new TinyDB(activity);
-                tinydb.putObject("concertObj", location);
+                tinydb.putObject("locationObj", location);
                 BaseFragment.singleLocationFragment(activity);
             }
         });

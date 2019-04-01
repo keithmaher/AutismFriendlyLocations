@@ -35,6 +35,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.keithmaher.autismfriendlylocations.fragments.BaseFragment;
 import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 
 public class Login extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
@@ -260,7 +261,6 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 firebaseUser = firebaseAuth.getCurrentUser();
-                                Toast.makeText(getContext(), "Signing in with " + googleMail, Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getContext(), BaseActivity.class);
                                 startActivity(intent);
                                 getActivity().finish();
