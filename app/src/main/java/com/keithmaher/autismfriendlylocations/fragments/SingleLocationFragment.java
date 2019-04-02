@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.keithmaher.autismfriendlylocations.BaseActivity;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.adapters.ViewPagerAdapter;
 import com.keithmaher.autismfriendlylocations.models.Location;
@@ -25,7 +26,9 @@ public class SingleLocationFragment extends BaseFragment implements OnMapReadyCa
     Location location;
     DatabaseReference mDatabase;
     LatLng mapLocation;
+    LatLng myLocation;
     MapView mapView;
+    BaseActivity baseActivity;
 
     public SingleLocationFragment() {
     }
@@ -35,6 +38,8 @@ public class SingleLocationFragment extends BaseFragment implements OnMapReadyCa
         mDatabase = FirebaseDatabase.getInstance().getReference();
         View view = inflater.inflate(R.layout.singlelocationfragment, container, false);
         location = getLocationObject(getContext());
+
+        baseActivity = (BaseActivity)getActivity();
 
         TabLayout tabLayout;
         ViewPager viewPager;
@@ -51,6 +56,10 @@ public class SingleLocationFragment extends BaseFragment implements OnMapReadyCa
         mapView.getMapAsync(this);
         mapLocation = new LatLng(lat, lon);
 
+        double myLat = Double.parseDouble(baseActivity.GPSLocationLAT);
+        double myLng = Double.parseDouble(baseActivity.GPSLocationLNG);
+        myLocation = new LatLng(myLat, myLng);
+
         return view;
     }
 
@@ -63,11 +72,13 @@ public class SingleLocationFragment extends BaseFragment implements OnMapReadyCa
         viewPager.setAdapter(adapter);
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
         googleMap.addMarker(new MarkerOptions().position(mapLocation)).showInfoWindow();
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mapLocation, 15));
+
     }
 
     @Override

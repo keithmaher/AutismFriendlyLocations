@@ -10,9 +10,8 @@
     <string name="title_activity_settings">User Settings</string>
     <string name="menuDelete">Delete Location</string>
     <string name="menuAdd">Add To List</string>
-
     <string name="google_maps_key">AIzaSyBEQqzTRe3xPDO6lxUPilb_7_hQT9BBD-M</string>
-
-    <string name="pref_header_general">General</string>
-
+    <string name="api_secret">EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV</string>
+    <string name="api_client">LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV</string>
+    <string name="url_base">https://api.foursquare.com/v2/venues/search</string>
 </resources>

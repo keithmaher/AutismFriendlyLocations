@@ -115,9 +115,9 @@ public class LocationAPIFragment extends BaseFragment{
         }
 
         if (prefCheck){
-            url = "https://api.foursquare.com/v2/venues/search?ll="+baseActivity.GPSLocationLAT+","+baseActivity.GPSLocationLNG+"&radius="+prefRadius+"&query="+prefQuery+"&v=28012019&limit="+prefLimit+"&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
+            url = getString(R.string.url_base)+"?ll="+baseActivity.GPSLocationLAT+","+baseActivity.GPSLocationLNG+"&radius="+prefRadius+"&query="+prefQuery+"&v=28012019&limit="+prefLimit+"&client_id="+getString(R.string.api_client)+"&client_secret="+getString(R.string.api_secret)+"";
         }else{
-            url = "https://api.foursquare.com/v2/venues/search?near="+prefName+"&query="+prefQuery+"&radius="+prefRadius+"&v=28012019&limit="+prefLimit+"&client_id=LIKFRNK34TNZQHOVJXSZEQNEFRGFS12VGLXRSHZBZKCG54XV&client_secret=EYNO0LDUNISNP2XBQIWZYP231NENGUA2GTYFFFHQAKGZGEFV";
+            url = getString(R.string.url_base)+"?near="+prefName+"&query="+prefQuery+"&radius="+prefRadius+"&v=28012019&limit="+prefLimit+"&client_id="+getString(R.string.api_client)+"&client_secret="+getString(R.string.api_secret)+"";
         }
 
         JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
