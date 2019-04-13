@@ -116,13 +116,4 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
         }
     }
 
-
-//    public static String dateCalculator(String dateStart) {
-//
-//
-//
-//    }
-
-
-
 }
