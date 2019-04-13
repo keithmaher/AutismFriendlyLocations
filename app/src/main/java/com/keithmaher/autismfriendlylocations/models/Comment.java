@@ -8,15 +8,35 @@ public class Comment extends Location {
     public String commentName;
     public String commentMain;
     public String commentDate;
+    public String commentLocationName;
+    public String commentUserImageURL;
 
     public Comment() {
     }
 
-    public Comment(String commentName, String commentMain, String commentDate) {
+    public Comment(String commentName, String commentMain, String commentDate, String commentUserImageURL, String commentLocationName) {
         this.commentId = UUID.randomUUID().toString();
         this.commentName = commentName;
         this.commentMain = commentMain;
         this.commentDate = commentDate;
+        this.commentUserImageURL = commentUserImageURL;
+        this.commentLocationName = commentLocationName;
+    }
+
+    public Comment(String commentName, String commentMain, String commentDate, String commentLocationName) {
+        this.commentId = UUID.randomUUID().toString();
+        this.commentName = commentName;
+        this.commentMain = commentMain;
+        this.commentDate = commentDate;
+        this.commentLocationName = commentLocationName;
+    }
+
+    public String getCommentLocationName() {
+        return commentLocationName;
+    }
+
+    public void setCommentLocationName(String commentLocationName) {
+        this.commentLocationName = commentLocationName;
     }
 
     public String getCommentDate() {
@@ -49,5 +69,13 @@ public class Comment extends Location {
 
     public void setCommentMain(String commentMain) {
         this.commentMain = commentMain;
+    }
+
+    public String getCommentUserImageURL() {
+        return commentUserImageURL;
+    }
+
+    public void setCommentUserImageURL(String commentUserImageURL) {
+        this.commentUserImageURL = commentUserImageURL;
     }
 }

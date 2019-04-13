@@ -1,125 +1,201 @@
 package com.keithmaher.autismfriendlylocations.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.ListFragment;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.ActionMode;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ListView;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.keithmaher.autismfriendlylocations.activities.BaseActivity;
-import com.keithmaher.autismfriendlylocations.activities.SearchDBLocations;
-import com.keithmaher.autismfriendlylocations.activities.SingleLocation;
-import com.keithmaher.autismfriendlylocations.adapters.CommentListAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.keithmaher.autismfriendlylocations.R;
+import com.keithmaher.autismfriendlylocations.Utils.TinyDB;
+import com.keithmaher.autismfriendlylocations.adapters.CommentAdapterView;
 import com.keithmaher.autismfriendlylocations.models.Comment;
+import com.keithmaher.autismfriendlylocations.models.Location;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
-import static com.keithmaher.autismfriendlylocations.activities.BaseActivity.locationComments;
-import static com.keithmaher.autismfriendlylocations.activities.BaseActivity.singleComment;
+import pl.droidsonroids.gif.GifImageView;
 
-public class CommentFragment extends ListFragment implements View.OnClickListener, AbsListView.MultiChoiceModeListener {
 
-    public BaseActivity activity;
-    public static CommentListAdapter listAdapter;
-    public ListView listView;
+public class CommentFragment extends BaseFragment {
+
+    DatabaseReference mDatabase;
+    DatabaseReference newDatabase;
+    CommentAdapterView adapter;
+    GifImageView loading;
+    FloatingActionButton addCommentButton;
+    String commentMain;
+    EditText comment;
+    TextView commentName;
+    TextView noCommentText;
 
     public CommentFragment() {
-        // Required empty public constructor
     }
 
-    public static CommentFragment newInstance() {
-        CommentFragment fragment = new CommentFragment();
-        return fragment;
+    @SuppressLint("RestrictedApi")
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        locationCommentList.clear();
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        String userEmail = firebaseUser.getEmail();
+
+        final Location location = getLocationObject(getContext());
+
+        String locationId = location.getLocationId();
+
+        newDatabase = FirebaseDatabase.getInstance().getReference("Comments").child(location.getLocationId()).push();
+
+        View view = inflater.inflate(R.layout.singlelocationcommentfragment, container, false);
+        noCommentText = view.findViewById(R.id.noCommentText);
+        noCommentText.setVisibility(View.GONE);
+        loading = view.findViewById(R.id.loadingGif);
+        addCommentButton = view.findViewById(R.id.addCommentButton);
+        addCommentButton.setVisibility(View.GONE);
+        adapter = new CommentAdapterView(locationCommentList, getActivity());
+
+
+        RecyclerView mRecycler = view.findViewById(R.id.recycler_category_menu1);
+        mRecycler.setAdapter(adapter);
+
+        locationComments(loading, locationId);
+
+        addComments(location, addCommentButton, userEmail);
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecycler.setLayoutManager(mLayoutManager);
+
+
+        Runnable progressRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                loading.setVisibility(View.GONE);
+                if (locationCommentList.isEmpty()) {
+                    noCommentText.setVisibility(View.VISIBLE);
+                }
+                noCommentText.setText(location.getLocationName()+" is not in our system\nBe the first to comment by adding it to our list");
+            }
+        };
+
+        Handler pdCanceller = new Handler();
+        pdCanceller.postDelayed(progressRunnable, 5000);
+
+
+
+
+        return view;
     }
 
-    @Override
-    public void onAttach(Context context)
-    {
-        super.onAttach(context);
-        this.activity = (BaseActivity) context;
-    }
+    private void addComments(final Location location, FloatingActionButton addCommentButton, final String userEmail) {
 
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        listAdapter = new CommentListAdapter(activity,  singleComment);
-        setListAdapter (listAdapter);
-    }
+        addCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, parent, savedInstanceState);
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+                v = getLayoutInflater().inflate(R.layout.commentalertbox, null);
+                alertDialog.setView(v);
+                comment = v.findViewById(R.id.editTextComment);
+                commentName = v.findViewById(R.id.editTextName);
+                commentName.setText(userEmail);
+                alertDialog.setTitle(location.locationName)
+                        .setMessage("Adding a comment"
+                                + "\n\n"
+                                + "Please let us know how you got on")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
 
-        listView = v.findViewById(android.R.id.list);
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        listView.setMultiChoiceModeListener(this);
+                                commentMain = comment.getText().toString();
+                                if (commentMain.isEmpty()) {
+                                    Toast.makeText(getContext(), "Please enter a comment", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Date cDate = new Date();
+                                    String fDate = new SimpleDateFormat("dd-MM-yyyy").format(cDate);
 
-        return v;
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-
-        new AlertDialog.Builder(activity)
-                .setTitle(singleComment.get(position).commentName)
-                .setMessage(singleComment.get(position).commentMain
-                        + "\n\n"
-                        + "Date added: "+singleComment.get(position).commentDate)
-                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
-    }
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-    }
-
-    @Override
-    public void onClick(View v) {
+                                    if(firebaseUser.getPhotoUrl() != null) {
+                                        newDatabase.setValue(new Comment(userEmail, commentMain, fDate, firebaseUser.getPhotoUrl().toString(), location.getLocationName()));
+                                    }else{
+                                        newDatabase.setValue(new Comment(userEmail, commentMain, fDate, location.getLocationName()));
+                                    }
+                                }
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                alertDialog.setView(v);
+                AlertDialog dialog = alertDialog.create();
+                dialog.show();
+            }
+        });
 
     }
 
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+    private void locationComments(final GifImageView loading, final String locationId) {
 
-    }
+        locationCommentList.clear();
+        mDatabase = FirebaseDatabase.getInstance().getReference("Comments").child(locationId);
+        ChildEventListener childEventListener = new ChildEventListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                Comment comment = dataSnapshot.getValue(Comment.class);
+                if (comment.commentUserImageURL == null){
+                    locationCommentList.add(new Comment(comment.commentName, comment.commentMain, comment.commentDate, comment.commentLocationName));
+                }else {
+                    locationCommentList.add(new Comment(comment.commentName, comment.commentMain, comment.commentDate, comment.commentUserImageURL, comment.commentLocationName));
+                }
+                adapter.notifyDataSetChanged();
+                loading.setVisibility(View.GONE);
+                addCommentButton.setVisibility(View.VISIBLE);
+            }
 
-    @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        return false;
-    }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                locationComments(loading, locationId);
+            }
 
-    @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        return false;
-    }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                locationComments(loading, locationId);
 
-    @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        return false;
-    }
+            }
 
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
 
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Failed to load comments.", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        mDatabase.addChildEventListener(childEventListener);
     }
 }
