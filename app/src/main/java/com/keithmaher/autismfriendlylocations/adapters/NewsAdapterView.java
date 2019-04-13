@@ -17,8 +17,12 @@ import com.keithmaher.autismfriendlylocations.models.Location;
 import com.keithmaher.autismfriendlylocations.models.News;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myViewHolder>{
 
@@ -49,7 +53,40 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
         viewHolder.name.setText(news.getNewsName());
         viewHolder.date.setText("Date added: "+news.getNewsDate());
         viewHolder.location.setText("Commented on "+news.getNewsLocation());
-        Picasso.get().load(news.getNewsImg()).fit().into(viewHolder.image);
+
+        if (news.getNewsImg() != null) {
+            Picasso.get().load(news.getNewsImg()).fit().into(viewHolder.image);
+        }
+
+        String dateStart = news.getNewsDate();
+        Date cDate = new Date();
+        String dateStop = new SimpleDateFormat("dd-MM-yyyy").format(cDate);
+
+        //HH converts hour in 24 hours format (0-23), day calculation
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+        Date d1 = null;
+        Date d2 = null;
+
+        try {
+            d1 = format.parse(dateStart);
+            d2 = format.parse(dateStop);
+
+            //in milliseconds
+            long diff = d2.getTime() - d1.getTime();
+            long diffDays = diff / (24 * 60 * 60 * 1000);
+
+            if(diffDays<1){
+                viewHolder.time.setText("Today");
+            }else{
+                viewHolder.time.setText(diffDays+" days ago");
+            }
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -63,8 +100,9 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
         private TextView name;
         private TextView date;
         private TextView location;
-        private ImageView image;
+        private CircleImageView image;
         private CardView card;
+        private TextView time;
 
         public myViewHolder(View itemView) {
             super(itemView);
@@ -73,9 +111,18 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
             date = itemView.findViewById(R.id.newsUserDate);
             card = itemView.findViewById(R.id.cardId);
             location = itemView.findViewById(R.id.newsLocation);
-
+            time = itemView.findViewById(R.id.timeDays);
 
         }
     }
+
+
+//    public static String dateCalculator(String dateStart) {
+//
+//
+//
+//    }
+
+
 
 }
