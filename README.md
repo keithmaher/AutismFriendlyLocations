@@ -19,8 +19,8 @@ Android App Version 2
 * This nav drawer is customised for each use using there logged in details. 
 
 # DX
-* No testing included.
-* Some hardcoded Strings
+* Uses mainly fragments.
+* Code is tidy and well presented. 
 
 # GitHub
 * I used Github throughout the assignment.
@@ -28,8 +28,12 @@ Android App Version 2
 
 # Persistence
 * The persistance within this app is Firebase realtime storage.
-* The Locations are stored in a JSON within Firebase and read into the App.
-* The API call is to foursquare and the information got back is stored in a list.
+* Both the Locations and the Comments are stored within Firebase.
+* The API makes the call to the endpoint everytime the "Search" fragment is loaded.
+
+# Instillation
+* To download and build in Android Studio - Download zip file or git clone repositorie.
+* Install app on your phone - Visit www.keithjmaher.ie > follow instructons, and enjoy.
 
 # Video Demo
 https://www.youtube.com/watch?v=PxSZ_L5MpkU
