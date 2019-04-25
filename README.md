@@ -1,17 +1,22 @@
 # Autism Friendly Locations
-Android Development Version 1
+Android App Version 2
 
-|Name            |Student No|
-|----------------|----------|
-|Keith Maher     | 20074612 |
+| Name        | Student No|
+|-------------|-----------|
+| Keith Maher |  20074612 |
 
-* This app was developed for Mobile Application module in Waterford Institute of Technology.
-* This app alows the user to search all locations local to the user and add specific locations to their own personal list. 
+* The app was developed for Mobile App Development module in Waterford Institute of Technology.
 * The app allows the user to add comments to the Location and view all information about that Location
 
+# API's
+* The app users API - www.fourquare.com - Gets a json list of places (Like Google Places). 
+* The app also uses the Google Maps API. 
 
 # UX
-* the navigation system is a nav drawer.
+* Inviting opening screen with some information to help user login
+* User stays logged in to avoid having to always type in details - Logged out from within thee app.
+* The navigation system is a nav drawer.
+* This nav drawer is customised for each use using there logged in details. 
 
 # DX
 * No testing included.
@@ -19,6 +24,7 @@ Android Development Version 1
 
 # GitHub
 * I used Github throughout the assignment.
+* Multiple commits & branches.
 
 # Persistence
 * The persistance within this app is Firebase realtime storage.
