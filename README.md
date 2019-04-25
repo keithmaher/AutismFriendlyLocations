@@ -1,9 +1,9 @@
 # Autism Friendly Locations
 Android App Version 2
 
-| Name        | Student No|
-|-------------|-----------|
-| Keith Maher |  20074612 |
+|Name        |Student No|
+|------------|----------|
+|Keith Maher |20074612  |
 
 * The app was developed for Mobile App Development module in Waterford Institute of Technology.
 * The app allows the user to add comments to the Location and view all information about that Location
