@@ -41,7 +41,7 @@ Android App Version 2
 * Install app on your phone - Visit www.keithjmaher.ie -> follow instructons, and enjoy.
 
 # Video Demo
-https://youtu.be/jJeWKsooqO4
+https://youtu.be/FaU39UPjQHw
 
 # References
 * https://github.com/tommybuonomo/dotsindicator#custom-attributes
