@@ -1,6 +1,7 @@
 package com.keithmaher.autismfriendlylocations.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -9,10 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.keithmaher.autismfriendlylocations.R;
 import com.keithmaher.autismfriendlylocations.Utils.TinyDB;
 import com.keithmaher.autismfriendlylocations.fragments.BaseFragment;
+import com.keithmaher.autismfriendlylocations.models.Comment;
 import com.keithmaher.autismfriendlylocations.models.Location;
 import com.keithmaher.autismfriendlylocations.models.News;
 import com.squareup.picasso.Picasso;
@@ -58,6 +68,7 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
             Picasso.get().load(news.getNewsImg()).fit().into(viewHolder.image);
         }
 
+
         String dateStart = news.getNewsDate();
         Date cDate = new Date();
         String dateStop = new SimpleDateFormat("dd-MM-yyyy").format(cDate);
@@ -87,7 +98,6 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -112,6 +122,7 @@ public class NewsAdapterView extends RecyclerView.Adapter<NewsAdapterView.myView
             card = itemView.findViewById(R.id.cardId);
             location = itemView.findViewById(R.id.newsLocation);
             time = itemView.findViewById(R.id.timeDays);
+            card = itemView.findViewById(R.id.cardId);
 
         }
     }

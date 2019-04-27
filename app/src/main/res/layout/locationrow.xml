@@ -62,17 +62,19 @@
 
         <TextView
             android:id="@+id/newsUserName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/newsUserImg"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_toRightOf="@+id/newsUserImg"
             android:gravity="center_vertical"
             android:text="Coffee Name"
             android:textColor="@color/colorPrimary"
             android:textSize="14sp"
             android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/newsUserImg"
             app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
