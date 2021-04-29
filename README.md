@@ -1,5 +1,5 @@
 # Autism Friendly Locations
-Android App Version 2
+ Android App Version 2
 
 |Name        |Student No|
 |------------|----------|
